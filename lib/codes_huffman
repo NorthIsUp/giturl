@@ -8,8 +8,8 @@ codes=(
 "repo"         "101111"
 "wordrev"      "101100"
 "chksum"       "101101"
-"site"         "100010"
-"flags"        "100011"
+"site_flags"   "100010"
+"unused1"      "100011"
 "unused3"      "1100110"
 
 ":"            "100000"
@@ -92,8 +92,8 @@ rcodes=(
 "101111"        "repo"
 "101100"        "wordrev"
 "101101"        "chksum"
-"100010"        "site"
-"100011"        "flags"
+"100010"        "site_flags"
+"100011"        "unused1"
 "1100110"       "unused3"
 
 "100000"        ":"
