@@ -1,16 +1,17 @@
 #!/usr/bin/env zsh
 
-ZERO="${(%):-%N}"
-REPO_DIR="${ZERO%/*}"
+local ZERO="${(%):-%N}"
+local BIN_DIR="${ZERO:h}"
 
 # On asciinema 0 and ZERO are functionargzero
-[ "$ZERO" = "$REPO_DIR" ] && REPO_DIR="$HOME/.gitl/gitl"
+[[ "$BIN_DIR" = "." ]] && BIN_DIR="/usr/local/bin"
 
-source "$REPO_DIR/lib/script_preamble"
-source "$REPO_DIR/lib/script_vars"
-source "$REPO_DIR/lib/math_functions"
-source "$REPO_DIR/lib/codes_huffman"
-source "$REPO_DIR/lib/coding_functions"
+local SHARE_DIR="${BIN_DIR:h}/share"
+source "$SHARE_DIR/giturl/script_preamble"
+source "$SHARE_DIR/giturl/script_vars"
+source "$SHARE_DIR/giturl/math_functions"
+source "$SHARE_DIR/giturl/codes_huffman"
+source "$SHARE_DIR/giturl/coding_functions"
 
 ZKL_HELP="0"
 ZKL_VERBOSE="-s"
