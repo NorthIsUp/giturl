@@ -1,7 +1,7 @@
 # FUNCTION: process_meta_data {{{
 # $1 - bits decoded from zcode
 # $REPLY = bits to skip
-# $reply = ( file "" rev "" repo "" wordrev "" chksum "" site "" unused1 "" unused2 "" unused3 "" error "" )
+# $reply = ( file "" rev "" repo "" wordrev "" chksum "" site "" flags "" unused2 "" unused3 "" error "" )
 process_meta_data() {
     local -a bits
     bits=( "$@" )
@@ -19,7 +19,7 @@ process_meta_data() {
         wordrev ""
         chksum ""
         site ""
-        unused1 ""
+        flags ""
         unused2 ""
         unused3 ""
         error ""
@@ -33,7 +33,7 @@ process_meta_data() {
             # We should skip one SS and there is nothing to decode
             REPLY="${#codes[ss]}"
             reply=( file "" rev "" repo "" wordrev "" chksum ""
-                    site "" unused1 "" unused2 "" unused3 "" error "" )
+                    site "" flags "" unused2 "" unused3 "" error "" )
             return 0
         fi
 
@@ -59,7 +59,7 @@ process_meta_data() {
             if [ -z "$mat" ]; then
                 REPLY="-1"
                 reply=( file "" rev "" repo "" wordrev "" chksum ""
-                        site "" unused1 "" unused2 "" unused3 "" error "" )
+                        site "" flags "" unused2 "" unused3 "" error "" )
                 return 1
             fi
 
@@ -71,10 +71,10 @@ process_meta_data() {
                 (ss)
                     break
                     ;;
-                (file|rev|repo|wordrev|chksum|site)
+                (file|rev|repo|wordrev|chksum|site|flags)
                     current_selector="$mat"
                     ;;
-                (unused1|unused2|unused3)
+                (unused2|unused3)
                     current_selector="$mat"
                     ;;
                 (*)
@@ -90,7 +90,7 @@ process_meta_data() {
         # No meta data and no special ending of zekyll bits
         REPLY="0"
         reply=( file "" rev "" repo "" wordrev "" chksum ""
-                site "" unused1 "" unused2 "" unused3 "" error "" )
+                site "" flags "" unused2 "" unused3 "" error "" )
     fi
 
     return 0
@@ -108,7 +108,7 @@ get_code_data() {
     bits=( "${reply[@]}" )
 
     process_meta_data "${bits[@]}"
-    # $reply contains: ( file "" rev "" repo "" wordrev "" chksum "" site "" unused1 "" unused2 "" unused3 "" error "" )
+    # $reply contains: ( file "" rev "" repo "" wordrev "" chksum "" site "" flags "" unused2 "" unused3 "" error "" )
     # $REPLY contains: number of final bits that contained the meta data
     local -a meta_reply
     meta_reply=( "${reply[@]}" )

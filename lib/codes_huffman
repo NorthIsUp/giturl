@@ -9,7 +9,7 @@ codes=(
 "wordrev"      "101100"
 "chksum"       "101101"
 "site"         "100010"
-"unused1"      "100011"
+"flags"        "100011"
 "unused2"      "100000"
 "unused3"      "1100110"
 "b"            "110001"
