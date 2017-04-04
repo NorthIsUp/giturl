@@ -1,0 +1,23 @@
+#!/usr/bin/env zsh
+
+ZERO="${(%):-%N}"
+REPO_DIR="${ZERO%/*}"
+
+# On asciinema 0 and ZERO are functionargzero
+[ "$ZERO" = "$REPO_DIR" ] && REPO_DIR="$HOME/.gitl/gitl"
+
+source "$REPO_DIR/lib/script_preamble"
+source "$REPO_DIR/lib/script_vars"
+source "$REPO_DIR/lib/math_functions"
+source "$REPO_DIR/lib/codes_huffman"
+source "$REPO_DIR/lib/coding_functions"
+
+ZKL_HELP="0"
+ZKL_VERBOSE="-s"
+ZKL_QUIET="0"
+ZKL_NOANSI="0"
+ZKL_REPO=""
+local -A opthash
+zparseopts -E -D -A opthash h -help v -verbose q -quiet n -noansi r: -repo: || exit 1
+
+echo "Will parse: $1"
