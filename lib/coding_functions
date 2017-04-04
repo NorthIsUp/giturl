@@ -1,3 +1,4 @@
+# FUNCTION: process_meta_data {{{
 # $1 - bits decoded from zcode
 # $REPLY = bits to skip
 # $reply = ( file "" rev "" repo "" wordrev "" chksum "" site "" unused1 "" unused2 "" unused3 "" error "" )
@@ -94,12 +95,11 @@ process_meta_data() {
 
     return 0
 }
-
+# }}}
+# FUNCTION: get_code_data {{{
 #
-# Gets zekylls for given code ($1)
-# Also gets meta data: rev, file, repo
-# and puts it into $reply array
-#
+# Gets meta data: rev, file, repo and puts it into $reply array
+# REPLY has the revision bits
 get_code_data() {
     local zcode="$1"
     decode_zcode "$zcode"
@@ -126,5 +126,104 @@ get_code_data() {
     REPLY="${bits[*]}"
     reply=( "${meta_reply[@]}" )
 }
+# }}}
+# FUNCTION: bits_start {{{
+bits_start() {
+    reply=( "${(@s::)codes[ss]}" )
+}
+# }}}
+# FUNCTION: bits_stop {{{
+bits_stop() {
+    reply=( "${(@s::)codes[ss]}" )
+}
+# }}}
+# FUNCTION: bits_rev {{{
+bits_rev() {
+    local -a bits
+    local rev="$1"
+
+    for lt in "${(@s::)rev}"; do
+        if [ -n "${codes[$lt]}" ];then
+            bits+=( "${(@s::)codes[$lt]}" )
+        elif [ -n "$lt" ]; then
+            SetMessage "Incorrect character in rev name: '$lt', trying to continue"
+        fi
+    done
+
+    # Rev preamble
+    if [[ "${#bits}" -gt "0" ]]; then
+        bits=( "${(@s::)codes[rev]}" "${bits[@]}" )
+    fi
+
+    reply=( "${bits[@]}" )
+    return 0
+}
+# }}}
+# FUNCTION: bits_file {{{
+bits_file() {
+    local -a bits
+    local file="$1"
+
+    for lt in "${(@s::)file}"; do
+        if [ -n "${codes[$lt]}" ];then
+            bits+=( "${(@s::)codes[$lt]}" )
+        elif [ -n "$lt" ]; then
+            SetMessage "Incorrect character in file name: '$lt', trying to continue"
+        fi
+    done
+
+    # File preamble
+    if [[ "${#bits}" -gt "0" ]]; then
+        bits=( "${(@s::)codes[file]}" "${bits[@]}" )
+    fi
+
+    reply=( "${bits[@]}" )
+    return 0
+}
+# }}}
+# FUNCTION: bits_repo {{{
+bits_repo() {
+    local -a bits
+    local repo="$1"
+
+    for lt in "${(@s::)repo}"; do
+        if [ -n "${codes[$lt]}" ]; then
+            bits+=( "${(@s::)codes[$lt]}" )
+        elif [ -n "$lt" ]; then
+            SetMessage "Incorrect character in repo name: '$lt', trying to continue"
+        fi
+    done
+
+    # Repo preamble
+    if [[ "${#bits}" -gt "0" ]]; then
+        bits=( "${(@s::)codes[repo]}" "${bits[@]}" )
+    fi
+
+    reply=( "${bits[@]}" )
+    return 0
+}
+# }}}
+# FUNCTION: bits_site {{{
+bits_site() {
+    local -a bits
+    local site="$1"
+
+    reply=()
+
+    # Github is the default site
+    [ "$site" = "gh" ] && return
+
+    local site_lt="${sites[$1]}"
+    [ -z "$site_lt" ] && return
+
+    bits+=( "${(@s::)codes[$site_lt]}" )
+
+    # Site preamble
+    bits=( "${(@s::)codes[site]}" "${bits[@]}" )
+
+    reply=( "${bits[@]}" )
+    return 0
+}
+# }}}
 
 # vim:ft=zsh

@@ -9,5 +9,10 @@ bindkey -e
 builtin autoload -Uz colors
 colors
 
+# FUNCTION: SetMessage {{{
+SetMessage() {
+    echo "$1"
+}
+# }}}
 
 # vim:ft=zsh
