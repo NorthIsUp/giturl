@@ -1,0 +1,32 @@
+typeset -g LIB_DIR="${REPO_DIR/lib}"
+typeset -g ZKL_HOME="$HOME/.zekyll"
+typeset -g ZKL_REPOS_DIR="$ZKL_HOME/repos"
+typeset -g ZKL_DIR="$REPO_DIR"
+
+zmodload zsh/terminfo 2>/dev/null
+if [[ ( -n "${terminfo[colors]}" || -n "${termcap[Co]}" ) && -z "${functions[colors]}" ]]; then
+    builtin autoload -Uz colors
+    colors
+fi
+
+typeset -gAH ZKLCOL
+ZKLCOL=(
+    "title" ""
+    "pname" "${fg_bold[yellow]}"
+    "uname" "${fg_bold[magenta]}"
+    "keyword" "${fg_bold[green]}"
+    "error" "${fg_bold[red]}"
+    "p" "${fg_bold[blue]}"
+    "bar" "${fg_bold[magenta]}"
+    "info1" "${fg_bold[green]}"
+    "info2" "${fg_bold[yellow]}"
+    "info3" "${fg_bold[red]}"
+    "uninst" "${fg_bold[blue]}"
+    "success" "${fg_bold[green]}"
+    "failure" "${fg_bold[red]}"
+    "rst" "$reset_color"
+)
+
+section_letters=( A B C D E F G H I J K L M N O P Q R S T U V W X Y Z )
+
+# vim:ft=zsh

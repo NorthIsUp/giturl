@@ -1,0 +1,253 @@
+#
+# Sets ZKL_INDEX_ZEKYLLS array which contains all
+# zekylls that potentially can be part of the
+# index
+#
+set_index() {
+    integer index="$1"
+
+    ZKL_INDEX_ZEKYLLS=( )
+
+    # Compute first element pointed to by index
+    integer first=$(( (index-1)*150 ))
+
+    integer i
+    for (( i=first; i<=(first+150-1); i ++ )); do
+        # Convert the number to base 36 with leading zeros
+        convert_integer_to_base_36 "$i"
+        ZKL_INDEX_ZEKYLLS+=( "$REPLY" )
+        #print "$REPLY $i"
+    done
+    #print -rl "${ZKL_INDEX_ZEKYLLS[@]}"
+}
+
+#
+# Returns array of file names of files that
+# belong to current index
+#
+get_files_of_index() {
+    local -a filter
+    filter=( "${ZKL_INDEX_ZEKYLLS[@]//*(#m)/$MATCH.*}" )
+    reply=( $^~filter(N) )
+}
+
+# Checks what possible files in index exist,
+# counts them and checks for holes - which
+# would mean inconsistency
+#
+# It also returns the files
+compute_index_size_check_consistency() {
+    get_files_of_index
+
+    # Save for return
+    local -a files
+    files=( "${reply[@]}" )
+
+    # Detected inconsistent files
+    reply2=()
+
+    # Focus on listing?
+    integer listing=0
+    [ "$1" = "-f" ] && listing=1
+
+    # Will work on reply
+    integer start_size end_size nomatch=0 consistent=1
+    local zzz
+    for zzz in "${ZKL_INDEX_ZEKYLLS[@]}"; do
+        start_size="${#reply}"
+        [[ "$start_size" -eq 0 ]] && break
+        reply=( "${reply[@]:#$zzz.*(#m)}" )
+        end_size="${#reply}"
+
+        # Are the sizes equal, meaning no match of $zzz zekyll?
+        if [[ "$start_size" -eq "$end_size" ]]; then
+            consistent=0
+
+            # Remember the not existing zekyll.
+            # Zekylls that are after-last actual
+            # zekyll will not be reported as the
+            # loop will not run, because reply
+            # will be empty
+            reply2+=( "$zzz >> not existing <<" )
+
+            nomatch=1
+        # Was this a multiple match?
+        elif (( start_size - end_size > 1 )); then
+            consistent=0
+
+            # Remember the multiple-matching zekyll
+            reply2+=( "$MATCH >> multiple match for $zzz <<" )
+
+            # End on first error if listing,
+            # not consistency investigating
+            [[ "$listing" -eq "1" ]] && break
+        # Normal match
+        else
+            # Match after no match?
+            if (( nomatch == 1 )); then
+                consistent=0
+
+                # After regaining matching of any zekyll
+                # pretend that the index is consistent, so
+                # that only right-after-unmatched zekylls
+                # will be reported
+                nomatch=0
+
+                reply2+=( "$MATCH >> first after not existing <<" )
+
+                # Should focus on listing index's files?
+                # Or wait till the nomatch to gather all
+                # inconsistent files? First inconsistent
+                # file is still reported
+                [[ "$listing" -eq "1" ]] && break
+            fi
+        fi
+    done
+
+    REPLY="${#files}"
+    reply=( "${files[@]}" )
+
+    return $(( 1-consistent ))
+}
+
+# $1 - bits decoded from zcode
+# $REPLY = bits to skip
+# $reply = ( file "" rev "" repo "" wordrev "" chksum "" site "" unused1 "" unused2 "" unused3 "" error "" )
+process_meta_data() {
+    local -a bits
+    bits=( "$@" )
+    integer size="$#"
+
+    bits=( "${(Oa)bits[@]}" )
+    local strbits="${(j::)bits}"
+    integer init_len="${#strbits}"
+
+    local -A decoded
+    decoded=(
+        file ""
+        rev ""
+        repo ""
+        wordrev ""
+        chksum ""
+        site ""
+        unused1 ""
+        unused2 ""
+        unused3 ""
+        error ""
+    )
+
+    # Is there SS?
+    if [ "${strbits[1,${#codes[ss]}]}" = "${codes[ss]}" ]; then
+        strbits="${strbits[${#codes[ss]}+1,-1]}"
+        # Is there immediate following SS?
+        if [ "${strbits[1,${#codes[ss]}]}" = "${codes[ss]}" ]; then
+            # We should skip one SS and there is nothing to decode
+            REPLY="${#codes[ss]}"
+            reply=( file "" rev "" repo "" wordrev "" chksum ""
+                    site "" unused1 "" unused2 "" unused3 "" error "" )
+            return 0
+        fi
+
+        #
+        # Follows meta data, decode it
+        #
+
+        # keys of the 'decoded' hash
+        local current_selector="error"
+        integer trylen
+        local mat trystr
+        while (( 1 )); do
+            mat=""
+            for (( trylen=1; trylen <= 7; trylen ++ )); do
+                # Take substring of len $trylen and check if
+                # it matches any Huffman code
+                trystr="${strbits[1,trylen]}"
+                mat="${rcodes[$trystr]}"
+                [ -n "$mat" ] && break
+            done
+
+            # General failure in decoding the string
+            if [ -z "$mat" ]; then
+                REPLY="-1"
+                reply=( file "" rev "" repo "" wordrev "" chksum ""
+                        site "" unused1 "" unused2 "" unused3 "" error "" )
+                return 1
+            fi
+
+            # Skip decoded bits
+            strbits="${strbits[trylen+1,-1]}"
+
+            # Handle what has been matched, either selector or data
+            case "$mat" in
+                (ss)
+                    break
+                    ;;
+                (file|rev|repo|wordrev|chksum|site)
+                    current_selector="$mat"
+                    ;;
+                (unused1|unused2|unused3)
+                    current_selector="$mat"
+                    ;;
+                (*)
+                    [ "$current_selector" = "site" ] && mat="${rsites[$mat]}"
+                    decoded[$current_selector]+="$mat"
+                    ;;
+            esac
+        done
+
+        REPLY="$(( init_len - ${#strbits} ))"
+        reply=( "${(kv)decoded[@]}" )
+    else
+        # No meta data and no special ending of zekyll bits
+        REPLY="0"
+        reply=( file "" rev "" repo "" wordrev "" chksum ""
+                site "" unused1 "" unused2 "" unused3 "" error "" )
+    fi
+
+    return 0
+}
+
+#
+# Gets zekylls for given code ($1)
+# Also gets meta data: rev, file, repo
+# and puts it into $reply array
+#
+get_zekylls_for_code() {
+    local zcode="$1"
+    decode_zcode "$zcode"
+
+    local -a bits
+    bits=( "${reply[@]}" )
+
+    process_meta_data "${bits[@]}"
+    # $reply contains: ( file "" rev "" repo "" wordrev "" chksum "" site "" unused1 "" unused2 "" unused3 "" error "" )
+    # $REPLY contains: number of final bits that contained the meta data
+    local -a meta_reply
+    meta_reply=( "${reply[@]}" )
+
+    # Skip bits that were processed as meta data
+    bits=( "${(@)bits[1,-1*REPLY-1]}" )
+
+    # Two last bits here are version
+    version=( "${(@)bits[-2,-1]}" )
+    bits[-1]=()
+    bits[-1]=()
+
+    integer size="${#bits}"
+
+    # Last zekyll from $reply is first zekyll
+    # in ZKL_INDEX_ZEKYLLS, thus the size-i+1
+    # Less significant bit is first zekyll
+    integer i
+    local zekylls
+    for (( i=size; i>=1; i-- )); do
+        if [ "${bits[i]}" = "1" ]; then
+            zekylls+="${ZKL_INDEX_ZEKYLLS[size-i+1]}"
+        fi
+    done
+
+    REPLY="$zekylls"
+    reply=( "${meta_reply[@]}" )
+}
+
+# vim:ft=zsh

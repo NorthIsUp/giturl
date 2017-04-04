@@ -1,0 +1,13 @@
+emulate -LR zsh
+
+zmodload zsh/zutil
+
+setopt extendedglob typesetsilent
+
+bindkey -e
+
+builtin autoload -Uz colors
+colors
+
+
+# vim:ft=zsh

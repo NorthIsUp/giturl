@@ -1,0 +1,8 @@
+local -A sites
+sites=(
+    "gh"    "github.com"
+    "bb"    "bitbucket.org"
+    "gl"    "gitlab.com"
+)
+
+# vim:ft=zsh

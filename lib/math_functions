@@ -1,0 +1,340 @@
+setopt typesetsilent
+
+local -a characters
+characters=( 0 1 2 3 4 5 6 7 8 9 a b c d e f g h i j k l m n o p q r s t u v w x y z )
+
+# FUNCTION: letters_to_numbers {{{
+# Converts each character of input string into number 0..35
+#
+letters_to_numbers() {
+    local letters="$1" l
+
+    reply=( )
+
+    if [[ "$letters" != [a-z0-9]## ]]; then
+        print "Incorrect character detected in: '$letters'. Zekylls should consist only from a-z 0-9 characters"
+        return 1
+    fi
+
+    integer number
+    for l in "${(@s::)letters}"; do
+        number="${characters[(i)$l]}"
+        number=number-1
+        reply+=( "$number" )
+    done
+
+    return 0
+}
+# }}}
+# FUNCTION: numbers_to_letters {{{
+# Converts array of numbers into string [a-z0-9]+
+numbers_to_letters() {
+    REPLY=""
+    integer i
+    for i in "$@"; do
+        if [[ "$i" -lt 0 || "$i" -gt 35 ]]; then
+            print "Incorrect number during character conversion: $i"
+            return 1
+        fi
+        REPLY+="${characters[i+1]}"
+    done
+
+    return 0
+}
+# }}}
+# FUNCTION: decode_zcode {{{
+# Takes zekyl code, i.e. 1/someletters
+# and decodes it to series of zekylls
+#
+decode_zcode() {
+    local number="${1%/*}"
+    local letters="${1#*/}"
+
+    if [ "$1" = "${1//\//}" ]; then
+        # Improper zcode
+        return 1
+    fi
+
+    # The zcode can have at most 30 digits
+    # This is the 150 bits (150 zekylls)
+    # written in base 36. We have to obtain
+    # the 150 bits. We will implement division
+    # in base 36 and gradually obtain the 150 bits.
+
+    local -a bits
+    local workingvar="$letters"
+    while [ "${workingvar//0/}" != "" ]; do
+        div2 "$workingvar"
+        workingvar="${reply[1]}"
+        bits=( "${reply[2]}" "${bits[@]}" )
+        # print "After div $workingvar/${reply[2]}"
+    done
+    # print "Bits of the letters $letters are: ${(j::)bits[@]}"
+    reply=( "${bits[@]}" )
+}
+# }}}
+# FUNCTION: get_integer_from_base_36 {{{
+# Converts given base-36 string into integer
+# Warning: it tagets integer (signed), so
+# the size of number is limited here (while
+# decode_zcode generates series of bits of
+# arbitrary length)
+get_integer_from_base_36() {
+    local letters="$1"
+    local -a bits
+    local workingvar="$letters"
+
+    # Get base-2 generated array consisting of 1 and 0
+    while [ "${workingvar//0/}" != "" ]; do
+        div2 "$workingvar"
+        workingvar="${reply[1]}"
+        bits=( "${reply[2]}" "${bits[@]}" )
+    done
+
+    # Now sum up the obtained 0 and 1
+    integer i mul=1 size="${#bits}"
+    REPLY="0"
+    for (( i=size; i>=1; i-- )); do
+        REPLY=$(( REPLY + bits[i]*mul ))
+        mul=$(( mul * 2 ))
+    done
+
+    # TODO: detect overflow and other problems
+    return 0
+}
+# }}}
+# FUNCTION: encode_zcode_str01 {{{
+# Takes string of 0 and 1 that mark which zekylls are active
+# and encodes it to base 36 number expressed via a-z0-9
+#
+encode_zcode_str01() {
+    str_01_to_24-bit_pack_numbers "$1"
+    encode_zcode_24-bit_pack_numbers "${reply[@]}"
+
+}
+# }}}
+# FUNCTION: encode_zcode_arr01 {{{
+# Takes array (positional parameters) of 0 and 1 that mark which
+# zekylls are active and encodes it to base 36 number expressed
+# via a-z0-9
+#
+encode_zcode_arr01() {
+    arr_01_to_24-bit_pack_numbers "$@"
+    encode_zcode_24-bit_pack_numbers "${reply[@]}"
+}
+# }}}
+# FUNCTION: encode_zcode_24-bit_pack_numbers {{{
+# Takes 24-bit pack numbers whose bits mark which zekylls are active
+# and encodes them to base 36 number expressed via a-z0-9
+#
+encode_zcode_24-bit_pack_numbers() {
+    numbers=( "$@" )
+
+    local -a nums_base36 workingvar
+    workingvar=( "${numbers[@]}" )
+
+    integer all_zero=1 i
+    for i in "${workingvar[@]}"; do
+        if [[ "$i" -ne 0 ]]; then
+            all_zero=0
+            break
+        fi
+    done
+
+    while (( all_zero != 1 )); do
+        div_24-bit_pack_numbers_36 "${workingvar[@]}"
+        workingvar=( "${reply[@]}" )
+        nums_base36=( "$REPLY" "${nums_base36[@]}" )
+
+        # Check if workingvar is all zero
+        all_zero=1
+        for i in "${workingvar[@]}"; do
+            if [[ "$i" -ne 0 ]]; then
+                all_zero=0
+                break
+            fi
+        done
+    done
+
+    # print "Base36 numbers of $str01 are: ${(j:,:)nums_base36[@]}"
+    numbers_to_letters "${nums_base36[@]}"
+    reply=( "${nums_base36[@]}" )
+}
+# }}}
+# FUNCTION: div2 {{{
+# $1 - zcode's letters
+# $reply - ( "zcode's letters after division" "remainder 0 or 1" )
+div2() {
+
+    #
+    # First translate the letters to numbers and put them into array
+    #
+
+    local letters="$1"
+    local -a numbers
+    letters_to_numbers "$letters" || return 1
+    numbers=( "${reply[@]}" )
+
+    #
+    # Now operate on the array performing long-division
+    #
+
+    integer cur last
+    cur=1
+    last="${#numbers}"
+
+    local -a result
+    result=()
+
+    integer prepared_for_division="${numbers[cur]}"
+    while (( 1 )); do
+        integer quotient=prepared_for_division/2
+
+        result+=( "$quotient" )
+
+        integer recovered=$(( quotient*2 ))
+        integer subtracted=prepared_for_division-recovered
+
+        cur+=1
+        if (( cur > last )); then
+            break
+        fi
+
+        prepared_for_division=36*subtracted+${numbers[cur]}
+    done
+
+    #
+    # Now convert the result to letters
+    #
+
+    numbers_to_letters "${result[@]}" || return 2
+
+    #
+    # Return
+    #
+
+    reply=( "$REPLY" "$subtracted" )
+
+    return 0
+}
+# }}}
+# FUNCTION: str_01_to_24-bit_pack_numbers {{{
+# Takes STRING of 0 and 1 and converts it to array of numbers
+# that are 24-bit packs taken from right to left, from the string
+#
+str_01_to_24-bit_pack_numbers() {
+    local -a bits
+    bits=( "${(@s::)1}" )
+    arr_01_to_24-bit_pack_numbers "${bits[@]}"
+
+    return 0
+}
+# }}}
+# FUNCTION: arr_01_to_24-bit_pack_numbers {{{
+# Takes ARRAY (@) of 0 and 1 and converts it to array of numbers
+# that are 24-bit packs taken from right to left, from the string
+#
+arr_01_to_24-bit_pack_numbers() {
+    local -a bits pack numbers
+    bits=( "$@" )
+    integer count=0 i size="${#bits}"
+
+    # Take packs of 8 bits, convert each to number and store in array
+    for (( i=size; i>=1; i-- )); do
+        pack=( "$bits[i]" "${pack[@]}" )
+        count+=1
+        (( count < 24 && i != 1 )) && continue
+        count=0
+
+        # Convert the max. 8 bit pack to number
+        integer result=0 p
+        for p in "${pack[@]}"; do
+            result=result*2+p
+        done
+
+        numbers=( "$result" "${numbers[@]}" )
+        pack=( )
+    done
+
+    reply=( "${numbers[@]}" )
+    return 0
+}
+# }}}
+# FUNCTION: div_24-bit_pack_numbers_36 {{{
+# $1 - series of 0 and 1 (bits marking which zekyll is active)
+# $reply - ( "series of 0 and 1, result of division" "remainder 0 ... 35" )
+div_24-bit_pack_numbers_36() {
+    local -a numbers
+    numbers=( "$@" )
+
+    # print "Dividing numbers: " "${numbers[@]}"
+
+    #
+    # Now operate on the array performing long-division
+    #
+
+    integer cur last
+    cur=1
+    last="${#numbers}"
+
+    local -a result
+    result=()
+
+    integer prepared_for_division="${numbers[cur]}"
+    while (( 1 )); do
+        integer quotient=prepared_for_division/36
+
+        result+=( "$quotient" )
+
+        integer recovered=$(( quotient*36 ))
+        integer subtracted=prepared_for_division-recovered
+
+        cur+=1
+        if (( cur > last )); then
+            break
+        fi
+
+        prepared_for_division=16777216*subtracted+${numbers[cur]}
+    done
+
+    # print "Result of division: " "${result[@]}"
+    # print "Remainder: $subtracted"
+
+    #
+    # Return
+    #
+
+    reply=( "${result[@]}" )
+    REPLY="$subtracted"
+
+    return 0
+}
+# }}}
+# FUNCTION: convert_integer_to_base_36 {{{
+# Takes number in $1, returns string [a-z0-9]+
+# that is representation of the number in base 36
+#
+convert_integer_to_base_36() {
+    integer number="$1"
+    local -a digits
+
+    integer new_number=number
+    integer remainder
+    while (( new_number != 0 )); do
+        remainder=new_number%36
+        new_number=new_number/36
+
+        digits+=( "$remainder" )
+    done
+
+    [[ "${#digits}" -eq 0 ]] && digits+=( 0 )
+    [[ "${#digits}" -eq 1 ]] && digits+=( 0 )
+    [[ "${#digits}" -eq 2 ]] && digits+=( 0 )
+
+    digits=( "${(Oa)digits[@]}" )
+
+    numbers_to_letters "${digits[@]}"
+}
+# }}}
+
+# vim:ft=zsh
