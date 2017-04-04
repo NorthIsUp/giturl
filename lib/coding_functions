@@ -100,7 +100,7 @@ process_meta_data() {
 # Also gets meta data: rev, file, repo
 # and puts it into $reply array
 #
-get_zekylls_for_code() {
+get_code_data() {
     local zcode="$1"
     decode_zcode "$zcode"
 
@@ -123,18 +123,7 @@ get_zekylls_for_code() {
 
     integer size="${#bits}"
 
-    # Last zekyll from $reply is first zekyll
-    # in ZKL_INDEX_ZEKYLLS, thus the size-i+1
-    # Less significant bit is first zekyll
-    integer i
-    local zekylls
-    for (( i=size; i>=1; i-- )); do
-        if [ "${bits[i]}" = "1" ]; then
-            zekylls+="${ZKL_INDEX_ZEKYLLS[size-i+1]}"
-        fi
-    done
-
-    REPLY="$zekylls"
+    REPLY="${bits[*]}"
     reply=( "${meta_reply[@]}" )
 }
 
