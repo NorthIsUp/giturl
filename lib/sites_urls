@@ -1,5 +1,5 @@
-local -A sites
-sites=(
+local -A sites_urls
+sites_urls=(
     "gh"    "github.com"
     "bb"    "bitbucket.org"
     "gl"    "gitlab.com"
