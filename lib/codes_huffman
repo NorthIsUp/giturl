@@ -167,16 +167,34 @@ rcodes=(
 "1100100"       "C"
 )
 
-local -A sites
-sites=(
+local -A sites_flags
+sites_flags=(
+# Sites
     gh  1
     bb  2
     gl  3
+# Flags
+    ssh     z
+    git     y
+    http    x
+    https   w
+    ftp     v
+    ftps    u
+    rsync   t
 )
 
-local -A rsites
-rsites=(
+local -A rsites_flags
+rsites_flags=(
+# Sites
     1   gh
     2   bb
     3   gl
+# Flags
+    z   ssh
+    y   git
+    x   http
+    w   https
+    v   ftp
+    u   ftps
+    t   rsync
 )
