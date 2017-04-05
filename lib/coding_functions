@@ -75,8 +75,12 @@ process_meta_data() {
                     current_selector="$mat"
                     ;;
                 (*)
-                    [ "$current_selector" = "site" ] && mat="${rsites[$mat]}"
-                    decoded[$current_selector]+="$mat"
+                    [[ "$current_selector" = "site_flags" ]] && {
+                        mat="${rsites[$mat]}"
+                        decoded[$current_selector]+="$mat,"
+                    } || {
+                        decoded[$current_selector]+="$mat"
+                    }
                     ;;
             esac
         done
