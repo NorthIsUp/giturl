@@ -110,7 +110,7 @@ else
     if [[ "$code" != [a-zA-Z0-9]## ]]; then
         print "Error in code. First argument should be gitu://... or just the code (alpha-numeric characters only)"
         exit 10
-    elif decode_zcode "$code"; then
+    elif decode_gcode "$code"; then
         local -a bits
         bits=( "${reply[@]}" )
 

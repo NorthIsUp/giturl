@@ -1,5 +1,5 @@
 # FUNCTION: process_meta_data {{{
-# $1 - bits decoded from zcode
+# $1 - bits decoded from gcode
 # $REPLY = bits to skip
 # $reply = ( file "" rev "" repo "" wordrev "" chksum "" site "" site_inline "" flags "" unused1 "" unused3 "" error "" )
 process_meta_data() {
@@ -123,8 +123,8 @@ process_meta_data() {
 # Gets meta data: rev, file, repo and puts it into $reply array
 # REPLY has the revision bits
 get_code_data() {
-    local zcode="$1"
-    decode_zcode "$zcode"
+    local gcode="$1"
+    decode_gcode "$gcode"
 
     local -a bits
     bits=( "${reply[@]}" )
@@ -382,7 +382,7 @@ build_code() {
         bits=( "${bits[@]}" "${appendix[@]}" )
     fi
 
-    encode_zcode_arr01 "${bits[@]}"
+    encode_gcode_arr01 "${bits[@]}"
 }
 # }}}
 

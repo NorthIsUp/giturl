@@ -42,11 +42,9 @@ numbers_to_letters() {
     return 0
 }
 # }}}
-# FUNCTION: decode_zcode {{{
-# Takes zekyl code, i.e. 1/someletters
-# and decodes it to series of zekylls
-#
-decode_zcode() {
+# FUNCTION: decode_gcode {{{
+# Turns gcode into bits
+decode_gcode() {
     local letters="$1"
 
     local -a bits
@@ -65,7 +63,7 @@ decode_zcode() {
 # Converts given base-62 string into integer
 # Warning: it tagets integer (signed), so
 # the size of number is limited here (while
-# decode_zcode generates series of bits of
+# decode_gcode generates series of bits of
 # arbitrary length)
 get_integer_from_base_62() {
     local letters="$1"
@@ -91,30 +89,30 @@ get_integer_from_base_62() {
     return 0
 }
 # }}}
-# FUNCTION: encode_zcode_str01 {{{
-# Takes string of 0 and 1 that mark which zekylls are active
-# and encodes it to base 62 number expressed via 0-9a-zA-Z
+# FUNCTION: encode_gcode_str01 {{{
+# Takes string of 0 and 1 and encodes it to
+# base 62 number expressed via 0-9a-zA-Z
 #
-encode_zcode_str01() {
+encode_gcode_str01() {
     str_01_to_24-bit_pack_numbers "$1"
-    encode_zcode_24-bit_pack_numbers "${reply[@]}"
+    encode_gcode_24-bit_pack_numbers "${reply[@]}"
 
 }
 # }}}
-# FUNCTION: encode_zcode_arr01 {{{
+# FUNCTION: encode_gcode_arr01 {{{
 # Takes array (positional parameters) of 0 and 1 and
 # encodes it to base 62 number expressed via 0-9a-zA-Z
 #
-encode_zcode_arr01() {
+encode_gcode_arr01() {
     arr_01_to_24-bit_pack_numbers "$@"
-    encode_zcode_24-bit_pack_numbers "${reply[@]}"
+    encode_gcode_24-bit_pack_numbers "${reply[@]}"
 }
 # }}}
-# FUNCTION: encode_zcode_24-bit_pack_numbers {{{
+# FUNCTION: encode_gcode_24-bit_pack_numbers {{{
 # Takes 24-bit pack numbers and encodes them
 # to base 62 number expressed via 0-9a-zA-Z
 #
-encode_zcode_24-bit_pack_numbers() {
+encode_gcode_24-bit_pack_numbers() {
     numbers=( "$@" )
 
     local -a nums_base62 workingvar
@@ -149,8 +147,8 @@ encode_zcode_24-bit_pack_numbers() {
 }
 # }}}
 # FUNCTION: div2 {{{
-# $1 - zcode's letters
-# $reply - ( "zcode's letters after division" "remainder 0 or 1" )
+# $1 - gcode's letters
+# $reply - ( "gcode's letters after division" "remainder 0 or 1" )
 div2() {
 
     #
@@ -239,7 +237,7 @@ arr_01_to_24-bit_pack_numbers() {
 }
 # }}}
 # FUNCTION: div_24-bit_pack_numbers_62 {{{
-# $1 - series of 0 and 1 (bits marking which zekyll is active)
+# $1 - series of 0 and 1
 # $reply - ( "series of 0 and 1, result of division" "remainder 0 ... 61" )
 div_24-bit_pack_numbers_62() {
     local -a numbers
