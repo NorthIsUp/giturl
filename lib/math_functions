@@ -1,18 +1,18 @@
 setopt typesetsilent
 
 local -a characters
-characters=( 0 1 2 3 4 5 6 7 8 9 a b c d e f g h i j k l m n o p q r s t u v w x y z )
+characters=( 0 1 2 3 4 5 6 7 8 9 a b c d e f g h i j k l m n o p q r s t u v w x y z A B C D E F G H I J K L M N O P Q R S T U V W X Y Z )
 
 # FUNCTION: letters_to_numbers {{{
-# Converts each character of input string into number 0..35
+# Converts each character of input string into number 0..61
 #
 letters_to_numbers() {
     local letters="$1" l
 
     reply=( )
 
-    if [[ "$letters" != [a-z0-9]## ]]; then
-        print "Incorrect character detected in: '$letters'. Zekylls should consist only from a-z 0-9 characters"
+    if [[ "$letters" != [0-9a-zA-Z]## ]]; then
+        print "Incorrect character detected in: '$letters'. Zekylls should consist only from a-z A-Z 0-9 characters"
         return 1
     fi
 
@@ -27,12 +27,12 @@ letters_to_numbers() {
 }
 # }}}
 # FUNCTION: numbers_to_letters {{{
-# Converts array of numbers into string [a-z0-9]+
+# Converts array of numbers into string [0-9a-zA-Z]+
 numbers_to_letters() {
     REPLY=""
     integer i
     for i in "$@"; do
-        if [[ "$i" -lt 0 || "$i" -gt 35 ]]; then
+        if [[ "$i" -lt 0 || "$i" -gt 61 ]]; then
             print "Incorrect number during character conversion: $i"
             return 1
         fi
@@ -49,12 +49,6 @@ numbers_to_letters() {
 decode_zcode() {
     local letters="$1"
 
-    # The zcode can have at most 30 digits
-    # This is the 150 bits (150 zekylls)
-    # written in base 36. We have to obtain
-    # the 150 bits. We will implement division
-    # in base 36 and gradually obtain the 150 bits.
-
     local -a bits
     local workingvar="$letters"
     while [ "${workingvar//0/}" != "" ]; do
@@ -67,13 +61,13 @@ decode_zcode() {
     reply=( "${bits[@]}" )
 }
 # }}}
-# FUNCTION: get_integer_from_base_36 {{{
-# Converts given base-36 string into integer
+# FUNCTION: get_integer_from_base_62 {{{
+# Converts given base-62 string into integer
 # Warning: it tagets integer (signed), so
 # the size of number is limited here (while
 # decode_zcode generates series of bits of
 # arbitrary length)
-get_integer_from_base_36() {
+get_integer_from_base_62() {
     local letters="$1"
     local -a bits
     local workingvar="$letters"
@@ -99,7 +93,7 @@ get_integer_from_base_36() {
 # }}}
 # FUNCTION: encode_zcode_str01 {{{
 # Takes string of 0 and 1 that mark which zekylls are active
-# and encodes it to base 36 number expressed via a-z0-9
+# and encodes it to base 62 number expressed via 0-9a-zA-Z
 #
 encode_zcode_str01() {
     str_01_to_24-bit_pack_numbers "$1"
@@ -108,9 +102,8 @@ encode_zcode_str01() {
 }
 # }}}
 # FUNCTION: encode_zcode_arr01 {{{
-# Takes array (positional parameters) of 0 and 1 that mark which
-# zekylls are active and encodes it to base 36 number expressed
-# via a-z0-9
+# Takes array (positional parameters) of 0 and 1 and
+# encodes it to base 62 number expressed via 0-9a-zA-Z
 #
 encode_zcode_arr01() {
     arr_01_to_24-bit_pack_numbers "$@"
@@ -118,13 +111,13 @@ encode_zcode_arr01() {
 }
 # }}}
 # FUNCTION: encode_zcode_24-bit_pack_numbers {{{
-# Takes 24-bit pack numbers whose bits mark which zekylls are active
-# and encodes them to base 36 number expressed via a-z0-9
+# Takes 24-bit pack numbers and encodes them
+# to base 62 number expressed via 0-9a-zA-Z
 #
 encode_zcode_24-bit_pack_numbers() {
     numbers=( "$@" )
 
-    local -a nums_base36 workingvar
+    local -a nums_base62 workingvar
     workingvar=( "${numbers[@]}" )
 
     integer all_zero=1 i
@@ -136,9 +129,9 @@ encode_zcode_24-bit_pack_numbers() {
     done
 
     while (( all_zero != 1 )); do
-        div_24-bit_pack_numbers_36 "${workingvar[@]}"
+        div_24-bit_pack_numbers_62 "${workingvar[@]}"
         workingvar=( "${reply[@]}" )
-        nums_base36=( "$REPLY" "${nums_base36[@]}" )
+        nums_base62=( "$REPLY" "${nums_base62[@]}" )
 
         # Check if workingvar is all zero
         all_zero=1
@@ -150,9 +143,9 @@ encode_zcode_24-bit_pack_numbers() {
         done
     done
 
-    # print "Base36 numbers of $str01 are: ${(j:,:)nums_base36[@]}"
-    numbers_to_letters "${nums_base36[@]}" # Result in $REPLY
-    reply=( "${nums_base36[@]}" )          # Additional result
+    # print "Base62 numbers of $str01 are: ${(j:,:)nums_base62[@]}"
+    numbers_to_letters "${nums_base62[@]}" # Result in $REPLY
+    reply=( "${nums_base62[@]}" )          # Additional result
 }
 # }}}
 # FUNCTION: div2 {{{
@@ -194,7 +187,7 @@ div2() {
             break
         fi
 
-        prepared_for_division=36*subtracted+${numbers[cur]}
+        prepared_for_division=62*subtracted+${numbers[cur]}
     done
 
     #
@@ -254,10 +247,10 @@ arr_01_to_24-bit_pack_numbers() {
     return 0
 }
 # }}}
-# FUNCTION: div_24-bit_pack_numbers_36 {{{
+# FUNCTION: div_24-bit_pack_numbers_62 {{{
 # $1 - series of 0 and 1 (bits marking which zekyll is active)
-# $reply - ( "series of 0 and 1, result of division" "remainder 0 ... 35" )
-div_24-bit_pack_numbers_36() {
+# $reply - ( "series of 0 and 1, result of division" "remainder 0 ... 61" )
+div_24-bit_pack_numbers_62() {
     local -a numbers
     numbers=( "$@" )
 
@@ -276,11 +269,11 @@ div_24-bit_pack_numbers_36() {
 
     integer prepared_for_division="${numbers[cur]}"
     while (( 1 )); do
-        integer quotient=prepared_for_division/36
+        integer quotient=prepared_for_division/62
 
         result+=( "$quotient" )
 
-        integer recovered=$(( quotient*36 ))
+        integer recovered=$(( quotient*62 ))
         integer subtracted=prepared_for_division-recovered
 
         cur+=1
@@ -304,19 +297,19 @@ div_24-bit_pack_numbers_36() {
     return 0
 }
 # }}}
-# FUNCTION: convert_integer_to_base_36 {{{
-# Takes number in $1, returns string [a-z0-9]+
-# that is representation of the number in base 36
+# FUNCTION: convert_integer_to_base_62 {{{
+# Takes number in $1, returns string [0-9a-zA-Z]+
+# that is representation of the number in base 62
 #
-convert_integer_to_base_36() {
+convert_integer_to_base_62() {
     integer number="$1"
     local -a digits
 
     integer new_number=number
     integer remainder
     while (( new_number != 0 )); do
-        remainder=new_number%36
-        new_number=new_number/36
+        remainder=new_number%62
+        new_number=new_number/62
 
         digits+=( "$remainder" )
     done
