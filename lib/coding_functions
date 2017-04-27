@@ -25,10 +25,10 @@ process_meta_data() {
     )
 
     # Is there SS?
-    if [ "${strbits[1,${#codes[ss]}]}" = "${codes[ss]}" ]; then
+    if [[ "${strbits[1,${#codes[ss]}]}" = "${codes[ss]}" ]]; then
         strbits="${strbits[${#codes[ss]}+1,-1]}"
         # Is there immediate following SS?
-        if [ "${strbits[1,${#codes[ss]}]}" = "${codes[ss]}" ]; then
+        if [[ "${strbits[1,${#codes[ss]}]}" = "${codes[ss]}" ]]; then
             # We should skip one SS and there is nothing to decode
             REPLY="${#codes[ss]}"
             reply=( file "" rev "" repo "" wordrev "" chksum "" site_flags "" unused1 "" unused3 "" error "" )
@@ -54,7 +54,7 @@ process_meta_data() {
             done
 
             # General failure in decoding the string
-            if [ -z "$mat" ]; then
+            if [[ -z "$mat" ]]; then
                 REPLY="-1"
                 reply=( file "" rev "" repo "" wordrev "" chksum "" site_flags "" unused1 "" unused3 "" error "" )
                 return 1
@@ -143,9 +143,9 @@ bits_rev() {
     local rev="$1"
 
     for lt in "${(@s::)rev}"; do
-        if [ -n "${codes[$lt]}" ];then
+        if [[ -n "${codes[$lt]}" ]];then
             bits+=( "${(@s::)codes[$lt]}" )
-        elif [ -n "$lt" ]; then
+        elif [[ -n "$lt" ]]; then
             SetMessage "Incorrect character in rev name: '$lt', trying to continue"
         fi
     done
@@ -165,9 +165,9 @@ bits_path() {
     local file="$1"
 
     for lt in "${(@s::)file}"; do
-        if [ -n "${codes[$lt]}" ];then
+        if [[ -n "${codes[$lt]}" ]];then
             bits+=( "${(@s::)codes[$lt]}" )
-        elif [ -n "$lt" ]; then
+        elif [[ -n "$lt" ]]; then
             SetMessage "Incorrect character in file name: '$lt', trying to continue"
         fi
     done
@@ -187,9 +187,9 @@ bits_repo() {
     local repo="$1"
 
     for lt in "${(@s::)repo}"; do
-        if [ -n "${codes[$lt]}" ]; then
+        if [[ -n "${codes[$lt]}" ]]; then
             bits+=( "${(@s::)codes[$lt]}" )
-        elif [ -n "$lt" ]; then
+        elif [[ -n "$lt" ]]; then
             SetMessage "Incorrect character in repo name: '$lt', trying to continue"
         fi
     done
@@ -338,7 +338,7 @@ build_code() {
     bits_remove_if_start_stop "${appendix[@]}"
     appendix=( "${reply[@]}" )
 
-    if [ "${#appendix}" = 0 ]; then
+    if [[ "${#appendix}" = 0 ]]; then
         # Cannot happen (in-data SS bits at the end) with version bits 0,0
         local -a rev_bits
         rev_bits=( "${(@s::)codes['ss']}" )
