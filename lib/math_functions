@@ -166,15 +166,11 @@ div2() {
     # Now operate on the array performing long-division
     #
 
-    integer cur last
-    cur=1
-    last="${#numbers}"
-
     local -a result
     result=()
 
-    integer prepared_for_division="${numbers[cur]}"
-    while (( 1 )); do
+    integer prepared_for_division="${numbers[1]}" input
+    for input in ${(@)numbers[2,-1]} 0; do
         integer quotient=prepared_for_division/2
 
         result+=( "$quotient" )
@@ -182,12 +178,7 @@ div2() {
         integer recovered=$(( quotient*2 ))
         integer subtracted=prepared_for_division-recovered
 
-        cur+=1
-        if (( cur > last )); then
-            break
-        fi
-
-        prepared_for_division=62*subtracted+${numbers[cur]}
+        prepared_for_division=62*subtracted+input
     done
 
     #
