@@ -1,11 +1,11 @@
 # FUNCTION: process_meta_data {{{
 # $1 - bits decoded from zcode
 # $REPLY = bits to skip
-# $reply = ( file "" rev "" repo "" wordrev "" chksum "" site_flags "" unused1 "" unused3 "" error "" )
+# $reply = ( file "" rev "" repo "" wordrev "" chksum "" site "" site_inline "" flags "" unused1 "" unused3 "" error "" )
 process_meta_data() {
     local -a bits
     bits=( "$@" )
-    integer size="$#"
+    integer size="$#" inline=0
 
     bits=( "${(Oa)bits[@]}" )
     local strbits="${(j::)bits}"
@@ -18,7 +18,9 @@ process_meta_data() {
         repo ""
         wordrev ""
         chksum ""
-        site_flags ""
+        site ""
+        site_inline ""
+        flags ""
         unused1 ""
         unused3 ""
         error ""
@@ -31,7 +33,7 @@ process_meta_data() {
         if [[ "${strbits[1,${#codes[ss]}]}" = "${codes[ss]}" ]]; then
             # We should skip one SS and there is nothing to decode
             REPLY="${#codes[ss]}"
-            reply=( file "" rev "" repo "" wordrev "" chksum "" site_flags "" unused1 "" unused3 "" error "" )
+            reply=( file "" rev "" repo "" wordrev "" chksum "" site "" site_inline "" flags "" unused1 "" unused3 "" error "" )
             return 0
         fi
 
@@ -56,7 +58,7 @@ process_meta_data() {
             # General failure in decoding the string
             if [[ -z "$mat" ]]; then
                 REPLY="-1"
-                reply=( file "" rev "" repo "" wordrev "" chksum "" site_flags "" unused1 "" unused3 "" error "" )
+                reply=( file "" rev "" repo "" wordrev "" chksum "" site "" site_inline "" flags "" unused1 "" unused3 "" error "" )
                 return 1
             fi
 
@@ -68,16 +70,36 @@ process_meta_data() {
                 (ss)
                     break
                     ;;
-                (file|rev|repo|wordrev|chksum|site_flags)
+                (file|rev|repo|wordrev|chksum)
+                    inline=0
                     current_selector="$mat"
                     ;;
+                (site_flags)
+                    [[ "$current_selector" = "site_flags" ]] && {
+                        inline=1
+                    } || {
+                        inline=0
+                        current_selector="$mat"
+                    }
+                    ;;
                 (unused2|unused3)
+                    inline=0
                     current_selector="$mat"
                     ;;
                 (*)
                     [[ "$current_selector" = "site_flags" ]] && {
-                        mat="${rsites_flags[$mat]}"
-                        decoded[$current_selector]+="$mat,"
+                        if (( inline )); then
+                            decoded[site_inline]+="$mat"
+                        else
+                            if [[ ${characters[(i)$mat]} -gt ${characters[(i)3]} ]]; then
+                                mat="${rsites_flags[$mat]}"
+                                [[ -n "${decoded[flags]}" ]] && decoded[flags]+=","
+                                decoded[flags]+="$mat"
+                            else
+                                mat="${rsites_flags[$mat]}"
+                                decoded[site]="$mat"
+                            fi
+                        fi
                     } || {
                         decoded[$current_selector]+="$mat"
                     }
@@ -222,20 +244,11 @@ bits_site_flags() {
     #
 
     integer skip=0
-    case "$site" in
-        github.com)
-            site="gh"
-            ;;
-        bitbucket.org)
-            site="bb"
-            ;;
-        gitlab.com)
-            site="gl"
-            ;;
-        *)
-            skip=1
-            ;;
-    esac
+    if [[ -n "${server_site[$site]}" ]]; then
+        site="${server_site[$site]}"
+    else
+        skip=1
+    fi
 
     if (( skip )); then
         # Repeated site_flags preamble indicating inline-site

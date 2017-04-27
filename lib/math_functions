@@ -47,13 +47,7 @@ numbers_to_letters() {
 # and decodes it to series of zekylls
 #
 decode_zcode() {
-    local number="${1%/*}"
-    local letters="${1#*/}"
-
-    if [ "$1" = "${1//\//}" ]; then
-        # Improper zcode
-        return 1
-    fi
+    local letters="$1"
 
     # The zcode can have at most 30 digits
     # This is the 150 bits (150 zekylls)
