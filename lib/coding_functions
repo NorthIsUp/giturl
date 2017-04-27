@@ -206,15 +206,22 @@ bits_repo() {
 # FUNCTION: bits_site_flags {{{
 bits_site_flags() {
     local -a bits
-    local site="$1"
-    integer skip=0
+    local site="$1" lt
 
     reply=()
+
+    #
+    # Flags - the protocol
+    #
+
+    local proto_lt="${sites_flags[$proto]}"
+    [[ -n "$proto_lt" ]] && bits+=( "${(@s::)codes[$proto_lt]}" )
 
     #
     # Site
     #
 
+    integer skip=0
     case "$site" in
         github.com)
             site="gh"
@@ -225,28 +232,37 @@ bits_site_flags() {
         gitlab.com)
             site="gl"
             ;;
+        *)
+            skip=1
+            ;;
     esac
 
-    # Github is the default site
-    [[ "$site" = "gh" ]] && skip=1
+    if (( skip )); then
+        # Repeated site_flags preamble indicating inline-site
+        bits+=( "${(@s::)codes[site_flags]}" )
+        for lt in "${(@s::)site}"; do
+            if [[ -n "${codes[$lt]}" ]];then
+                bits+=( "${(@s::)codes[$lt]}" )
+            elif [[ -n "$lt" ]]; then
+                SetMessage "Incorrect character in server-part of URL: '$lt', trying to continue"
+            fi
+        done
+    else
+        # Github is the default site
+        [[ "$site" = "gh" ]] && skip=1
 
-    local site_lt="${sites_flags[$site]}"
-    [[ -z "$site_lt" ]] && skip=1
+        local site_lt="${sites_flags[$site]}"
+        [[ -z "$site_lt" ]] && skip=1
 
-    (( skip )) || bits+=( "${(@s::)codes[$site_lt]}" )
+        (( skip )) || bits+=( "${(@s::)codes[$site_lt]}" )
+    fi
 
     #
-    # Flags - the protocol
-    #
-
-    skip=0
-    local proto_lt="${sites_flags[$proto]}"
-    [[ -z "$proto_lt" ]] && skip=1
-    (( skip )) || bits+=( "${(@s::)codes[$proto_lt]}" )
-
     # Site preamble
-    (( ${#bits} > 0 )) && bits=( "${(@s::)codes[site_flags]}" "${bits[@]}" )
+    #
 
+    (( ${#bits} > 0 )) && bits=( "${(@s::)codes[site_flags]}" "${bits[@]}" )
+    
     reply=( "${bits[@]}" )
     return 0
 }
