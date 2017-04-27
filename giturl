@@ -28,83 +28,89 @@ zparseopts -E -D -A opthash h -help v -verbose q -quiet n -noansi p: -path: r: -
 (( ${+opthash[-r]} ))                           && GU_REVISION=${opthash[-r]}
 (( ${+opthash[--revision]} ))                   && GU_REVISION=${opthash[--revision]}
 
-local protocol user site port upath
+if (( GU_DECODE == 0 )); then
+    local protocol user site port upath
 
-# Correct matches
-if [[ "$1" = (#b)(git|http|https|ftp|ftps)://([a-zA-Z0-9._~-]##)(:[0-9]##)(#c0,1)/([a-zA-Z0-9./_~:-]##) ]]; then
-    protocol=${match[1]} site=${match[2]} port=${match[3]#:} upath=${match[4]}
-elif [[ "$1" = (#b)rsync://([a-zA-Z0-9._~-]##)/([a-zA-Z0-9./_~:-]##) ]]; then
-    protocol=rsync site=${match[1]} upath=${match[2]}
-elif [[ "$1" = (#b)ssh://([a-zA-Z0-9._~-]##@)(#c0,1)([a-zA-Z0-9._~-]##)(:[0-9]##)(#c0,1)/([a-zA-Z0-9./_~:-]##) ]]; then
-    protocol=ssh user=${match[1]%@} site=${match[2]} port=${match[3]#:} upath=${match[4]}
-elif [[ "$1" = (#b)([a-zA-Z0-9._~-]##@)(#c0,1)([a-zA-Z0-9._~-]##):([a-zA-Z0-9./_~:-]##) ]]; then
-    protocol=ssh user=${match[1]%@} site=${match[2]} upath=${match[3]}
+    # Correct matches
+    if [[ "$1" = (#b)(git|http|https|ftp|ftps)://([a-zA-Z0-9._~-]##)(:[0-9]##)(#c0,1)/([a-zA-Z0-9./_~:-]##) ]]; then
+        protocol=${match[1]} site=${match[2]} port=${match[3]#:} upath=${match[4]}
+    elif [[ "$1" = (#b)rsync://([a-zA-Z0-9._~-]##)/([a-zA-Z0-9./_~:-]##) ]]; then
+        protocol=rsync site=${match[1]} upath=${match[2]}
+    elif [[ "$1" = (#b)ssh://([a-zA-Z0-9._~-]##@)(#c0,1)([a-zA-Z0-9._~-]##)(:[0-9]##)(#c0,1)/([a-zA-Z0-9./_~:-]##) ]]; then
+        protocol=ssh user=${match[1]%@} site=${match[2]} port=${match[3]#:} upath=${match[4]}
+    elif [[ "$1" = (#b)([a-zA-Z0-9._~-]##@)(#c0,1)([a-zA-Z0-9._~-]##):([a-zA-Z0-9./_~:-](#c0,1)[a-zA-Z0-9._~:-][a-zA-Z0-9./_~:-]#) ]]; then
+        protocol=ssh user=${match[1]%@} site=${match[2]} upath=${match[3]}
 
-# Error matches
-elif [[ "$1" = (#b)(git|http|https|ftp|ftps)://([^/:]##)(:[^/]##)(#c0,1)/(?*) ]]; then
-    if [[ -n "${match[3]}" && "${match[3]}" != :[0-9]## ]]; then
-        print "Incorrect port number: ${match[3]#:}"
-    else
-        print "Forbidden characters used in URL, allowed are [a-zA-Z0-9._~-]"
-        if [[ "${match[2]}" != [a-zA-Z0-9._~-]## ]]; then
-            print "Url part: ${match[2]}"
+    # Error matches
+    elif [[ "$1" = (#b)(git|http|https|ftp|ftps)://([^/:]##)(:[^/]##)(#c0,1)/(?*) ]]; then
+        if [[ -n "${match[3]}" && "${match[3]}" != :[0-9]## ]]; then
+            print "Incorrect port number: ${match[3]#:}"
         else
-            print "Url part: ${match[4]}"
+            print "Forbidden characters used in URL, allowed are [a-zA-Z0-9._~-]"
+            if [[ "${match[2]}" != [a-zA-Z0-9._~-]## ]]; then
+                print "Url part: ${match[2]}"
+            else
+                print "Url part: ${match[4]}"
+            fi
         fi
-    fi
-    exit 2
-elif [[ "$1" = (#b)ssh://([^@]##@)(#c0,1)([^/:]##)(:[^/]##)(#c0,1)/(?*) ]]; then
-    if [[ -n "${match[1]}" && "${match[1]}" != [a-zA-Z0-9._~-]##@ ]]; then
-        print "Forbidden characters used in user name, allowed are [a-zA-Z0-9._~-]"
-        print "Obtained user name: ${match[1]%@}"
-    elif [[ -n "${match[3]}" && "${match[3]}" != :[0-9]## ]]; then
-        print "Incorrect port number: ${match[3]#:}"
-    else
-        print "Forbidden characters used in URL, allowed are [a-zA-Z0-9._~-]"
-        if [[ "${match[2]}" != [a-zA-Z0-9._~-]## ]]; then
-            print "Url part: ${match[2]}"
+        exit 2
+    elif [[ "$1" = (#b)ssh://([^@]##@)(#c0,1)([^/:]##)(:[^/]##)(#c0,1)/(?*) ]]; then
+        if [[ -n "${match[1]}" && "${match[1]}" != [a-zA-Z0-9._~-]##@ ]]; then
+            print "Forbidden characters used in user name, allowed are [a-zA-Z0-9._~-]"
+            print "Obtained user name: ${match[1]%@}"
+        elif [[ -n "${match[3]}" && "${match[3]}" != :[0-9]## ]]; then
+            print "Incorrect port number: ${match[3]#:}"
         else
-            print "Url part: ${match[4]}"
+            print "Forbidden characters used in URL, allowed are [a-zA-Z0-9._~-]"
+            if [[ "${match[2]}" != [a-zA-Z0-9._~-]## ]]; then
+                print "Url part: ${match[2]}"
+            else
+                print "Url part: ${match[4]}"
+            fi
         fi
-    fi
-    exit 3
-elif [[ "$1" = (#b)rsync://([^/]##)/(?*) ]]; then
-    print "Forbidden characters used in URL, allowed are [a-zA-Z0-9._~-]"
-    if [[ "${match[1]}" != [a-zA-Z0-9._~-]## ]]; then
-        print "Url part: ${match[1]}"
-    elif [[ "${match[2]}" != [a-zA-Z0-9._~-]## ]]; then
-        print "Url part: ${match[2]}"
-    fi
-    exit 4
-elif [[ "$1" != (rsync|git|http|https|ftp|ftps|ssh)://* && $1 = (#b)([^/:]##)://* ]]; then
-    print "Unsupported protocol: ${match[1]}"
-    exit 5
-elif [[ "$1" != (rsync|git|http|https|ftp|ftps|ssh)://* && "$1" = (#b)([^@]##@)(#c0,1)([^:]##):(*?) ]]; then
-    if [[ -n "${match[1]}" && "${match[1]}" != [a-zA-Z0-9._~-]##@ ]]; then
-        print "Forbidden characters used in user name, allowed are [a-zA-Z0-9._~-]"
-        print "Obtained user name: ${match[1]%@}"
-    else
+        exit 3
+    elif [[ "$1" = (#b)rsync://([^/]##)/(?*) ]]; then
         print "Forbidden characters used in URL, allowed are [a-zA-Z0-9._~-]"
-        if [[ "${match[2]}" != [a-zA-Z0-9._~-]## ]]; then
+        if [[ "${match[1]}" != [a-zA-Z0-9._~-]## ]]; then
+            print "Url part: ${match[1]}"
+        elif [[ "${match[2]}" != [a-zA-Z0-9._~-]## ]]; then
             print "Url part: ${match[2]}"
-        elif [[ "${match[3]}" != [a-zA-Z0-9._~-]## ]]; then
-            print "Url part: ${match[3]}"
         fi
+        exit 4
+    elif [[ "$1" != (rsync|git|http|https|ftp|ftps|ssh)://* && $1 = (#b)([^/:]##)://* ]]; then
+        print "Unsupported protocol: ${match[1]}"
+        exit 5
+    elif [[ "$1" != (rsync|git|http|https|ftp|ftps|ssh)://* && "$1" = (#b)([^@]##@)(#c0,1)([^:]##):(*?) ]]; then
+        if [[ -n "${match[1]}" && "${match[1]}" != [a-zA-Z0-9._~-]##@ ]]; then
+            print "Forbidden characters used in user name, allowed are [a-zA-Z0-9._~-]"
+            print "Obtained user name: ${match[1]%@}"
+        else
+            print "Forbidden characters used in URL, allowed are [a-zA-Z0-9._~-]"
+            if [[ "${match[2]}" != [a-zA-Z0-9._~-]## ]]; then
+                print "Url part: ${match[2]}"
+            elif [[ "${match[3]}" != [a-zA-Z0-9._~-]## ]]; then
+                print "Url part: ${match[3]}"
+            fi
+        fi
+        exit 6
+    else
+        print "Unrecognized url given: \`$1', aborting"
+        exit 7
     fi
-    exit 6
+
+    echo "Protocol: $protocol, User: $user, Site: $site, Port: $port, Repo: $upath"
+
+    build_code "$protocol" "$site" "$upath" "$GU_REVISION" "$GU_PATH"
+
+    print "Encoded into: gitu://$REPLY"
 else
-    print "Unrecognized url given: \`$1', aborting"
-    exit 7
-fi
+    local code="$1"
+    [[ "$code" = (#b)gitu://(*) ]] && code="${match[1]}"
 
-echo "Protocol: $protocol, User: $user, Site: $site, Port: $port, Repo: $upath"
-
-build_code "$protocol" "$site" "$upath" "$GU_REVISION" "$GU_PATH"
-
-print "Encoded into: gitu://$REPLY"
-
-if (( GU_DECODE )); then
-    if decode_zcode "$REPLY"; then
+    if [[ "$code" != [a-zA-Z0-9]## ]]; then
+        print "Error in code. First argument should be gitu://... or just the code (alpha-numeric characters only)"
+        exit 10
+    elif decode_zcode "$code"; then
         local -a bits
         bits=( "${reply[@]}" )
 
@@ -125,6 +131,9 @@ if (( GU_DECODE )); then
             print "Could not decode, error in given code"
             exit 8
         fi
+    else
+        print "Error in code. First argument should be gitu://... or just the code (alpha-numeric characters only)"
+        exit 9
     fi
 fi
 
