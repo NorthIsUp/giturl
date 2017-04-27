@@ -98,4 +98,8 @@ fi
 
 echo "Protocol: $protocol, User: $user, Site: $site, Port: $port, Repo: $upath"
 
+build_code "$protocol" "$site" "$upath" "$GU_REVISION" "$GU_PATH"
+
+print "Encoded into: gitu://$REPLY"
+
 exit 0

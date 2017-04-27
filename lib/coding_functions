@@ -159,8 +159,8 @@ bits_rev() {
     return 0
 }
 # }}}
-# FUNCTION: bits_file {{{
-bits_file() {
+# FUNCTION: bits_path {{{
+bits_path() {
     local -a bits
     local file="$1"
 
@@ -203,26 +203,157 @@ bits_repo() {
     return 0
 }
 # }}}
-# FUNCTION: bits_site {{{
-bits_site() {
+# FUNCTION: bits_site_flags {{{
+bits_site_flags() {
     local -a bits
     local site="$1"
+    integer skip=0
 
     reply=()
 
+    #
+    # Site
+    #
+
+    case "$site" in
+        github.com)
+            site="gh"
+            ;;
+        bitbucket.org)
+            site="bb"
+            ;;
+        gitlab.com)
+            site="gl"
+            ;;
+    esac
+
     # Github is the default site
-    [ "$site" = "gh" ] && return
+    [[ "$site" = "gh" ]] && skip=1
 
-    local site_lt="${sites[$1]}"
-    [ -z "$site_lt" ] && return
+    local site_lt="${sites_flags[$site]}"
+    [[ -z "$site_lt" ]] && skip=1
 
-    bits+=( "${(@s::)codes[$site_lt]}" )
+    (( skip )) || bits+=( "${(@s::)codes[$site_lt]}" )
+
+    #
+    # Flags - the protocol
+    #
+
+    skip=0
+    local proto_lt="${sites_flags[$proto]}"
+    [[ -z "$proto_lt" ]] && skip=1
+    (( skip )) || bits+=( "${(@s::)codes[$proto_lt]}" )
 
     # Site preamble
-    bits=( "${(@s::)codes[site]}" "${bits[@]}" )
+    (( ${#bits} > 0 )) && bits=( "${(@s::)codes[site_flags]}" "${bits[@]}" )
 
     reply=( "${bits[@]}" )
     return 0
+}
+# }}}
+# FUNCTION: bits_compare_suffix {{{
+bits_compare_suffix() {
+    local -a long_bits short_bits
+    long_bits=( "${(@s::)1}" )
+    short_bits=( "${(@s::)2}" )
+
+    if [[ "${#long_bits}" -lt "${#short_bits}" ]]; then
+        return 1
+    fi
+
+    # Check if short_bits occur at the end of long_bits
+    integer beg_idx=$(( ${#long_bits} - ${#short_bits} + 1 ))
+    integer end_idx="${#long_bits}"
+    integer l not_equal=0 s=1
+    for (( l=beg_idx; l <= end_idx; l++ )); do
+        if [[ "${long_bits[l]}" != "${short_bits[s]}" ]]; then
+            not_equal=1
+            break
+        fi
+        s+=1
+    done
+
+    return $not_equal
+}
+# }}}
+# FUNCTION: bits_remove_if_start_stop {{{
+bits_remove_if_start_stop() {
+    local -a appendix
+    appendix=( "$@" )
+
+    if bits_compare_suffix "${(j::)appendix}" "${codes[ss]}"; then
+        integer end_idx=$(( ${#appendix} - ${#codes[ss]} ))
+        appendix=( "${(@)appendix[1,end_idx]}" )
+
+        if bits_compare_suffix "${(j::)appendix}" "${codes[ss]}"; then
+            end_idx=$(( ${#appendix} - ${#codes[ss]} ))
+            appendix=( "${(@)appendix[1,end_idx]}" )
+
+            # Two consecutive SS bits occured, correct removal
+        else
+            # We couldn't remove second SS bits, so it means
+            # that there is some meta data, and we should
+            # restore already removed last SS bits
+            appendix+=( "${(@s::)codes[ss]}" )
+        fi
+    else
+        # This shouldn't happen, this function must be
+        # called after adding SS bits
+        reply=( "${appendix[@]}" )
+        return 1
+    fi
+
+    reply=( "${appendix[@]}" )
+    return 0
+}
+# }}}
+# FUNCTION: build_code {{{
+build_code() {
+    local proto="$1" site="$2" repo="$3" rev="$4" file_path="$5"
+
+    local -a bits
+    bits=( 0 0 )    # version
+
+    local -a appendix
+
+    bits_start
+    appendix+=( "${reply[@]}" )
+
+    bits_site_flags "$site" "$proto"
+    appendix+=( "${reply[@]}" )
+
+    bits_repo "$repo"
+    appendix+=( "${reply[@]}" )
+
+    bits_rev "$rev"
+    appendix+=( "${reply[@]}" )
+
+    bits_path "$file_path"
+    appendix+=( "${reply[@]}" )
+
+    bits_stop
+    appendix+=( "${reply[@]}" )
+
+    # Paranoid support for empty meta-data
+    bits_remove_if_start_stop "${appendix[@]}"
+    appendix=( "${reply[@]}" )
+
+    if [ "${#appendix}" = 0 ]; then
+        # Cannot happen (in-data SS bits at the end) with version bits 0,0
+        local -a rev_bits
+        rev_bits=( "${(@s::)codes['ss']}" )
+        rev_bits=( "${(Oa)rev_bits[@]}" )
+        if bits_compare_suffix "${(j::)bits}" "${(j::)rev_bits}"; then
+            # No metadata but 'ss' at end – add another
+            # one to mark that the 'ss' is a real data
+            bits=( "${bits[@]}" "${rev_bits[@]}" )
+        fi
+    else
+        appendix=( "${(Oa)appendix[@]}" )
+        bits=( "${bits[@]}" "${appendix[@]}" )
+    fi
+
+    encode_zcode_arr01 "${bits[@]}"
 }
 # }}}
 
