@@ -244,8 +244,8 @@ bits_site_flags() {
     #
 
     integer skip=0
-    if [[ -n "${server_site[$site]}" ]]; then
-        site="${server_site[$site]}"
+    if [[ -n "${server_site[${(L)site}]}" ]]; then
+        site="${server_site[${(L)site}]}"
     else
         skip=1
     fi
