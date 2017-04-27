@@ -76,7 +76,7 @@ process_meta_data() {
                     ;;
                 (*)
                     [[ "$current_selector" = "site_flags" ]] && {
-                        mat="${rsites[$mat]}"
+                        mat="${rsites_flags[$mat]}"
                         decoded[$current_selector]+="$mat,"
                     } || {
                         decoded[$current_selector]+="$mat"
