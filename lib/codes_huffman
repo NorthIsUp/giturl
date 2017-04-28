@@ -174,13 +174,6 @@ sites_flags=(
     bb  2
     gl  3
 # Flags
-    ssh     z
-    git     y
-    http    x
-    https   w
-    ftp     v
-    ftps    u
-    rsync   t
 )
 
 local -A rsites_flags
@@ -190,13 +183,6 @@ rsites_flags=(
     2   bb
     3   gl
 # Flags
-    z   ssh
-    y   git
-    x   http
-    w   https
-    v   ftp
-    u   ftps
-    t   rsync
 )
 
 local -A server_site
@@ -211,4 +197,26 @@ rserver_site=(
     gh  "github.com" 
     bb  "bitbucket.org"
     gl  "gitlab.com"
+)
+
+local -A proto_code
+proto_code=(
+    ssh     000
+    git     001
+    http    010
+    https   011
+    ftp     100
+    ftps    101
+    rsync   110
+)
+
+local -A rproto_code
+rproto_code=(
+    000    ssh     
+    001    git     
+    010    http    
+    011    https   
+    100    ftp     
+    101    ftps    
+    110    rsync   
 )

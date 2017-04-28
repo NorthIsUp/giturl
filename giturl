@@ -115,7 +115,7 @@ else
         bits=( "${reply[@]}" )
 
         if process_meta_data "${bits[@]}"; then
-            # $reply = ( file "" rev "" repo "" wordrev "" chksum "" site "" site_inline "" flags "" unused1 "" unused3 "" error "" )
+            # $reply = ( file "" rev "" repo "" wordrev "" chksum "" proto "" site "" site_inline "" flags "" port "" unused1 "" unused3 "" error "" )
             local -A mdata
             mdata=( "${reply[@]}" )
 
@@ -129,7 +129,7 @@ else
 
             [[ -z "${mdata[port]}" ]] && mdata[port]="<none>"
 
-            echo "DECODED Protocol: ${mdata[flags]}, site: $site, port: ${mdata[port]}, repo: ${mdata[repo]}, rev: ${mdata[rev]}, path: ${mdata[file]}"
+            echo "DECODED Protocol: ${mdata[proto]}, site: $site, port: ${mdata[port]}, repo: ${mdata[repo]}, rev: ${mdata[rev]}, path: ${mdata[file]}"
         else
             print "Could not decode, error in given code"
             exit 8

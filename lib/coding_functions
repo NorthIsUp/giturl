@@ -1,7 +1,7 @@
 # FUNCTION: process_meta_data {{{
 # $1 - bits decoded from gcode
 # $REPLY = bits to skip
-# $reply = ( file "" rev "" repo "" wordrev "" chksum "" site "" site_inline "" flags "" port "" unused1 "" unused3 "" error "" )
+# $reply = ( file "" rev "" repo "" wordrev "" chksum "" proto "" site "" site_inline "" flags "" port "" unused1 "" unused3 "" error "" )
 process_meta_data() {
     local -a bits
     bits=( "$@" )
@@ -18,6 +18,7 @@ process_meta_data() {
         repo ""
         wordrev ""
         chksum ""
+        proto ""
         site ""
         site_inline ""
         flags ""
@@ -34,7 +35,7 @@ process_meta_data() {
         if [[ "${strbits[1,${#codes[ss]}]}" = "${codes[ss]}" ]]; then
             # We should skip one SS and there is nothing to decode
             REPLY="${#codes[ss]}"
-            reply=( file "" rev "" repo "" wordrev "" chksum "" site "" site_inline "" flags "" port "" unused1 "" unused3 "" error "" )
+            reply=( file "" rev "" repo "" wordrev "" chksum "" proto "" site "" site_inline "" flags "" port "" unused1 "" unused3 "" error "" )
             return 0
         fi
 
@@ -59,7 +60,7 @@ process_meta_data() {
             # General failure in decoding the string
             if [[ -z "$mat" ]]; then
                 REPLY="-1"
-                reply=( file "" rev "" repo "" wordrev "" chksum "" site "" site_inline "" flags "" port "" unused1 "" unused3 "" error "" )
+                reply=( file "" rev "" repo "" wordrev "" chksum "" proto "" site "" site_inline "" flags "" port "" unused1 "" unused3 "" error "" )
                 return 1
             fi
 
@@ -82,7 +83,7 @@ process_meta_data() {
                         inline=0
                         current_selector="$mat"
 
-                        # Short path for port number - always 16 bits
+                        # Short path for port number - conditional constant 16 bits
                         if [[ "${strbits[1]}" = "1" ]]; then
                             local port_bits="${strbits[2,17]}"
                             decoded[port]=$(( [#10] 2#$port_bits ))
@@ -90,6 +91,11 @@ process_meta_data() {
                         else
                             strbits="${strbits[2,-1]}"
                         fi
+
+                        # Short path for protocol - always 3 bits
+                        local proto_bits="${strbits[1,3]}"
+                        decoded[proto]="${rproto_code[$proto_bits]}"
+                        strbits="${strbits[4,-1]}"
                     }
                     ;;
                 (unused2|unused3)
@@ -122,7 +128,7 @@ process_meta_data() {
     else
         # No meta data and no special ending of zekyll bits
         REPLY="0"
-        reply=( file "" rev "" repo "" wordrev "" chksum "" site_flags "" unused1 "" unused3 "" error "" )
+        reply=( file "" rev "" repo "" wordrev "" chksum "" proto "" site "" site_inline "" flags "" port "" unused1 "" unused3 "" error "" )
     fi
 
     return 0
@@ -257,11 +263,12 @@ bits_proto_site_port() {
     fi
 
     #
-    # Flags - the protocol
+    # Protocol
     #
 
-    local proto_lt="${sites_flags[$proto]}"
-    [[ -n "$proto_lt" ]] && bits+=( "${(@s::)codes[$proto_lt]}" )
+    local proto_bits="${proto_code[$proto]}"
+    [[ ${#proto_bits} -eq 3 ]] || proto_bits="111"
+    bits+=( "${(@s::)proto_bits}" )
 
     #
     # Site
