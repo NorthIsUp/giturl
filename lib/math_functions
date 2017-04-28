@@ -77,13 +77,13 @@ decode_gcode() {
     reply=( "${bits[@]}" )
 }
 # }}}
-# FUNCTION: get_integer_from_base_256 {{{
-# Converts given base-256 string into integer
+# FUNCTION: get_integer_from_base_512 {{{
+# Converts given base-512 string into integer
 # Warning: it tagets integer (signed), so
 # the size of number is limited here (while
 # decode_gcode generates series of bits of
 # arbitrary length)
-get_integer_from_base_256() {
+get_integer_from_base_512() {
     local letters="$1"
     local -a bits
     local workingvar="$letters"
@@ -108,7 +108,7 @@ get_integer_from_base_256() {
 }
 # }}}
 # FUNCTION: encode_gcode_str01 {{{
-# Takes string of 0 and 1 and encodes it to base-256
+# Takes string of 0 and 1 and encodes it to base-512
 # number expressed via 0-9a-zA-Z<Unicode chars>
 #
 encode_gcode_str01() {
@@ -119,7 +119,7 @@ encode_gcode_str01() {
 # }}}
 # FUNCTION: encode_gcode_arr01 {{{
 # Takes array (positional parameters) of 0 and 1 and encodes
-# it to base-256 number expressed via 0-9a-zA-Z<Unicode chars>
+# it to base-512 number expressed via 0-9a-zA-Z<Unicode chars>
 #
 encode_gcode_arr01() {
     arr_01_to_24-bit_pack_numbers "$@"
@@ -127,13 +127,13 @@ encode_gcode_arr01() {
 }
 # }}}
 # FUNCTION: encode_gcode_24-bit_pack_numbers {{{
-# Takes 24-bit pack numbers and encodes them to base-256
+# Takes 24-bit pack numbers and encodes them to base-512
 # number expressed via 0-9a-zA-Z<Unicode chars>
 #
 encode_gcode_24-bit_pack_numbers() {
     numbers=( "$@" )
 
-    local -a nums_base256 workingvar
+    local -a nums_base512 workingvar
     workingvar=( "${numbers[@]}" )
 
     integer all_zero=1 i
@@ -145,9 +145,9 @@ encode_gcode_24-bit_pack_numbers() {
     done
 
     while (( all_zero != 1 )); do
-        div_24-bit_pack_numbers_256 "${workingvar[@]}"
+        div_24-bit_pack_numbers_512 "${workingvar[@]}"
         workingvar=( "${reply[@]}" )
-        nums_base256=( "$REPLY" "${nums_base256[@]}" )
+        nums_base512=( "$REPLY" "${nums_base512[@]}" )
 
         # Check if workingvar is all zero
         all_zero=1
@@ -159,9 +159,9 @@ encode_gcode_24-bit_pack_numbers() {
         done
     done
 
-    # print "Base256 numbers of $str01 are: ${(j:,:)nums_base256[@]}"
-    numbers_to_letters "${nums_base256[@]}" # Result in $REPLY
-    reply=( "${nums_base256[@]}" )          # Additional result
+    # print "Base512 numbers of $str01 are: ${(j:,:)nums_base512[@]}"
+    numbers_to_letters "${nums_base512[@]}" # Result in $REPLY
+    reply=( "${nums_base512[@]}" )          # Additional result
 }
 # }}}
 # FUNCTION: div2 {{{
@@ -194,7 +194,7 @@ div2() {
         integer recovered=$(( quotient*2 ))
         integer subtracted=prepared_for_division-recovered
 
-        prepared_for_division=256*subtracted+input
+        prepared_for_division=512*subtracted+input
     done
 
     #
@@ -254,10 +254,10 @@ arr_01_to_24-bit_pack_numbers() {
     return 0
 }
 # }}}
-# FUNCTION: div_24-bit_pack_numbers_256 {{{
+# FUNCTION: div_24-bit_pack_numbers_512 {{{
 # $1 - series of 0 and 1
 # $reply - ( "series of 0 and 1, result of division" "remainder 0 ... 61" )
-div_24-bit_pack_numbers_256() {
+div_24-bit_pack_numbers_512() {
     local -a numbers
     numbers=( "$@" )
 
@@ -276,11 +276,11 @@ div_24-bit_pack_numbers_256() {
 
     integer prepared_for_division="${numbers[cur]}"
     while (( 1 )); do
-        integer quotient=prepared_for_division/256
+        integer quotient=prepared_for_division/512
 
         result+=( "$quotient" )
 
-        integer recovered=$(( quotient*256 ))
+        integer recovered=$(( quotient*512 ))
         integer subtracted=prepared_for_division-recovered
 
         cur+=1
@@ -304,19 +304,19 @@ div_24-bit_pack_numbers_256() {
     return 0
 }
 # }}}
-# FUNCTION: convert_integer_to_base_256 {{{
+# FUNCTION: convert_integer_to_base_512 {{{
 # Takes number in $1, returns [0-9a-zA-Z<unicode chars>]+
-# - representation of the number in base-256
+# - representation of the number in base-512
 #
-convert_integer_to_base_256() {
+convert_integer_to_base_512() {
     integer number="$1"
     local -a digits
 
     integer new_number=number
     integer remainder
     while (( new_number != 0 )); do
-        remainder=new_number%256
-        new_number=new_number/256
+        remainder=new_number%512
+        new_number=new_number/512
 
         digits+=( "$remainder" )
     done
