@@ -15,10 +15,14 @@ characters=( 0 1 2 3 4 5 6 7 8 9 a b c d e f g h i j k l m n o p q r s t u v w x
 ǅ ǆ Ǉ ǈ ǉ Ǌ ǋ ǌ Ǎ ǎ Ǐ ǐ Ǒ ǒ Ǔ ǔ Ǖ ǖ Ǘ ǘ Ǚ ǚ Ǜ ǜ ǝ Ǟ ǟ Ǡ ǡ Ǣ ǣ Ǥ ǥ Ǧ ǧ Ǩ ǩ Ǫ ǫ Ǭ ǭ Ǯ ǯ ǰ Ǳ ǲ ǳ Ǵ ǵ Ƕ Ƿ Ǹ ǹ Ǻ ǻ Ǽ ǽ Ǿ ǿ Ȁ ȁ Ȃ ȃ Ȅ ȅ Ȇ ȇ Ȉ ȉ
 Ȋ ȋ Ȍ ȍ Ȏ ȏ Ȑ ȑ Ȓ ȓ Ȕ ȕ Ȗ ȗ Ș ș Ț ț Ȝ ȝ Ȟ ȟ Ƞ ȡ Ȣ ȣ Ȥ ȥ Ȧ ȧ Ȩ ȩ Ȫ ȫ Ȭ ȭ Ȯ ȯ Ȱ ȱ Ȳ ȳ ȴ ȵ ȶ ȷ ȸ ȹ Ⱥ Ȼ ȼ Ƚ Ⱦ ȿ ɀ Ɂ ɂ Ƀ Ʉ Ʌ Ɇ ɇ Ɉ ɉ Ɋ ɋ Ɍ ɍ Ɏ ɏ
 
-# Latin Extended Additional [Ḁ-Ḵ]
+# Latin Extended Additional [Ḁ-ỿ]
 Ḁ ḁ Ḃ ḃ Ḅ ḅ Ḇ ḇ Ḉ ḉ Ḋ ḋ Ḍ ḍ Ḏ ḏ Ḑ ḑ Ḓ ḓ Ḕ ḕ Ḗ ḗ Ḙ ḙ Ḛ ḛ Ḝ ḝ Ḟ ḟ Ḡ ḡ Ḣ ḣ Ḥ ḥ Ḧ ḧ Ḩ ḩ Ḫ ḫ Ḭ ḭ Ḯ ḯ Ḱ ḱ Ḳ ḳ Ḵ
+ḵ Ḷ ḷ Ḹ ḹ Ḻ ḻ Ḽ ḽ Ḿ ḿ Ṁ ṁ Ṃ ṃ Ṅ ṅ Ṇ ṇ Ṉ ṉ Ṋ ṋ Ṍ ṍ Ṏ ṏ Ṑ ṑ Ṓ ṓ Ṕ ṕ Ṗ ṗ Ṙ ṙ Ṛ ṛ Ṝ ṝ Ṟ ṟ Ṡ ṡ Ṣ ṣ Ṥ ṥ Ṧ ṧ Ṩ ṩ
+Ṫ ṫ Ṭ ṭ Ṯ ṯ Ṱ ṱ Ṳ ṳ Ṵ ṵ Ṷ ṷ Ṹ ṹ Ṻ ṻ Ṽ ṽ Ṿ ṿ Ẁ ẁ Ẃ ẃ Ẅ ẅ Ẇ ẇ Ẉ ẉ Ẋ ẋ Ẍ ẍ Ẏ ẏ Ẑ ẑ Ẓ ẓ Ẕ ẕ ẖ ẗ ẘ ẙ ẚ ẛ ẜ ẝ ẞ
+ẟ Ạ ạ Ả ả Ấ ấ Ầ ầ Ẩ ẩ Ẫ ẫ Ậ ậ Ắ ắ Ằ ằ Ẳ ẳ Ẵ ẵ Ặ ặ Ẹ ẹ Ẻ ẻ Ẽ ẽ Ế ế Ề ề Ể ể Ễ ễ Ệ ệ Ỉ ỉ Ị ị Ọ ọ Ỏ ỏ Ố ố Ồ ồ
+Ổ ổ Ỗ ỗ Ộ ộ Ớ ớ Ờ ờ Ở ở Ỡ ỡ Ợ ợ Ụ ụ Ủ ủ Ứ ứ Ừ ừ Ử ử Ữ ữ Ự ự Ỳ ỳ Ỵ ỵ Ỷ ỷ Ỹ ỹ Ỻ ỻ Ỽ ỽ Ỿ ỿ
 
-# Character class for all: [0-9a-zA-ZµºÀ-ÖØ-áãäæ-öøú-ɏḀ-Ḵ]
+# Character class for all: [0-9a-zA-ZµºÀ-ÖØ-áãäæ-öøú-ɏḀ-ỿ]
 )
 
 local -A characters_map
@@ -48,7 +52,17 @@ Y 60 Z 61 µ 62 º 63 À 64 Á 65 Â 66 Ã 67 Ä 68 Å 69 Æ 70 Ç 71 È 72 É 7
 Ƚ 440 Ⱦ 441 ȿ 442 ɀ 443 Ɂ 444 ɂ 445 Ƀ 446 Ʉ 447 Ʌ 448 Ɇ 449 ɇ 450 Ɉ 451 ɉ 452 Ɋ 453 ɋ 454 Ɍ 455 ɍ 456 Ɏ 457 ɏ 458 Ḁ 459
 ḁ 460 Ḃ 461 ḃ 462 Ḅ 463 ḅ 464 Ḇ 465 ḇ 466 Ḉ 467 ḉ 468 Ḋ 469 ḋ 470 Ḍ 471 ḍ 472 Ḏ 473 ḏ 474 Ḑ 475 ḑ 476 Ḓ 477 ḓ 478 Ḕ 479
 ḕ 480 Ḗ 481 ḗ 482 Ḙ 483 ḙ 484 Ḛ 485 ḛ 486 Ḝ 487 ḝ 488 Ḟ 489 ḟ 490 Ḡ 491 ḡ 492 Ḣ 493 ḣ 494 Ḥ 495 ḥ 496 Ḧ 497 ḧ 498 Ḩ 499
-ḩ 500 Ḫ 501 ḫ 502 Ḭ 503 ḭ 504 Ḯ 505 ḯ 506 Ḱ 507 ḱ 508 Ḳ 509 ḳ 510 Ḵ 511
+ḩ 500 Ḫ 501 ḫ 502 Ḭ 503 ḭ 504 Ḯ 505 ḯ 506 Ḱ 507 ḱ 508 Ḳ 509 ḳ 510 Ḵ 511 ḵ 512 Ḷ 513 ḷ 514 Ḹ 515 ḹ 516 Ḻ 517 ḻ 518 Ḽ 519
+ḽ 520 Ḿ 521 ḿ 522 Ṁ 523 ṁ 524 Ṃ 525 ṃ 526 Ṅ 527 ṅ 528 Ṇ 529 ṇ 530 Ṉ 531 ṉ 532 Ṋ 533 ṋ 534 Ṍ 535 ṍ 536 Ṏ 537 ṏ 538 Ṑ 539
+ṑ 540 Ṓ 541 ṓ 542 Ṕ 543 ṕ 544 Ṗ 545 ṗ 546 Ṙ 547 ṙ 548 Ṛ 549 ṛ 550 Ṝ 551 ṝ 552 Ṟ 553 ṟ 554 Ṡ 555 ṡ 556 Ṣ 557 ṣ 558 Ṥ 559
+ṥ 560 Ṧ 561 ṧ 562 Ṩ 563 ṩ 564 Ṫ 565 ṫ 566 Ṭ 567 ṭ 568 Ṯ 569 ṯ 570 Ṱ 571 ṱ 572 Ṳ 573 ṳ 574 Ṵ 575 ṵ 576 Ṷ 577 ṷ 578 Ṹ 579
+ṹ 580 Ṻ 581 ṻ 582 Ṽ 583 ṽ 584 Ṿ 585 ṿ 586 Ẁ 587 ẁ 588 Ẃ 589 ẃ 590 Ẅ 591 ẅ 592 Ẇ 593 ẇ 594 Ẉ 595 ẉ 596 Ẋ 597 ẋ 598 Ẍ 599
+ẍ 600 Ẏ 601 ẏ 602 Ẑ 603 ẑ 604 Ẓ 605 ẓ 606 Ẕ 607 ẕ 608 ẖ 609 ẗ 610 ẘ 611 ẙ 612 ẚ 613 ẛ 614 ẜ 615 ẝ 616 ẞ 617 ẟ 618 Ạ 619
+ạ 620 Ả 621 ả 622 Ấ 623 ấ 624 Ầ 625 ầ 626 Ẩ 627 ẩ 628 Ẫ 629 ẫ 630 Ậ 631 ậ 632 Ắ 633 ắ 634 Ằ 635 ằ 636 Ẳ 637 ẳ 638 Ẵ 639
+ẵ 640 Ặ 641 ặ 642 Ẹ 643 ẹ 644 Ẻ 645 ẻ 646 Ẽ 647 ẽ 648 Ế 649 ế 650 Ề 651 ề 652 Ể 653 ể 654 Ễ 655 ễ 656 Ệ 657 ệ 658 Ỉ 659
+ỉ 660 Ị 661 ị 662 Ọ 663 ọ 664 Ỏ 665 ỏ 666 Ố 667 ố 668 Ồ 669 ồ 670 Ổ 671 ổ 672 Ỗ 673 ỗ 674 Ộ 675 ộ 676 Ớ 677 ớ 678 Ờ 679
+ờ 680 Ở 681 ở 682 Ỡ 683 ỡ 684 Ợ 685 ợ 686 Ụ 687 ụ 688 Ủ 689 ủ 690 Ứ 691 ứ 692 Ừ 693 ừ 694 Ử 695 ử 696 Ữ 697 ữ 698 Ự 699
+ự 700 Ỳ 701 ỳ 702 Ỵ 703 ỵ 704 Ỷ 705 ỷ 706 Ỹ 707 ỹ 708 Ỻ 709 ỻ 710 Ỽ 711 ỽ 712 Ỿ 713 ỿ 714
 )
 
 # FUNCTION: letters_to_numbers {{{
@@ -59,8 +73,8 @@ letters_to_numbers() {
 
     reply=( )
 
-    if [[ "$letters" != [0-9a-zA-ZµºÀ-ÖØ-áãäæ-öøú-ɏḀ-Ḵ]## ]]; then
-        print "Incorrect character detected in: '$letters'. Gcode should consist only from a-z, A-Z, 0-9 characters, plus 450 unicode characters [µºÀ-ÖØ-áãäæ-öøú-ɏḀ-Ḵ]"
+    if [[ "$letters" != [0-9a-zA-ZµºÀ-ÖØ-áãäæ-öøú-ɏḀ-ỿ]## ]]; then
+        print "Incorrect character detected in: '$letters'. Gcode should consist only from a-z, A-Z, 0-9 characters, plus 450 unicode characters [µºÀ-ÖØ-áãäæ-öøú-ɏḀ-ỿ]"
         return 1
     fi
 
@@ -79,7 +93,7 @@ numbers_to_letters() {
     REPLY=""
     integer i
     for i in "$@"; do
-        if [[ "$i" -lt 0 || "$i" -gt 511 ]]; then
+        if [[ "$i" -lt 0 || "$i" -gt 714 ]]; then
             print "Incorrect number during character conversion: $i"
             return 1
         fi
@@ -106,13 +120,13 @@ decode_gcode() {
     reply=( "${bits[@]}" )
 }
 # }}}
-# FUNCTION: get_integer_from_base_512 {{{
-# Converts given base-512 string into integer
+# FUNCTION: get_integer_from_base_715 {{{
+# Converts given base-715 string into integer
 # Warning: it tagets integer (signed), so
 # the size of number is limited here (while
 # decode_gcode generates series of bits of
 # arbitrary length)
-get_integer_from_base_512() {
+get_integer_from_base_715() {
     local letters="$1"
     local -a bits
     local workingvar="$letters"
@@ -137,7 +151,7 @@ get_integer_from_base_512() {
 }
 # }}}
 # FUNCTION: encode_gcode_str01 {{{
-# Takes string of 0 and 1 and encodes it to base-512
+# Takes string of 0 and 1 and encodes it to base-715
 # number expressed via 0-9a-zA-Z<Unicode chars>
 #
 encode_gcode_str01() {
@@ -148,7 +162,7 @@ encode_gcode_str01() {
 # }}}
 # FUNCTION: encode_gcode_arr01 {{{
 # Takes array (positional parameters) of 0 and 1 and encodes
-# it to base-512 number expressed via 0-9a-zA-Z<Unicode chars>
+# it to base-715 number expressed via 0-9a-zA-Z<Unicode chars>
 #
 encode_gcode_arr01() {
     arr_01_to_24-bit_pack_numbers "$@"
@@ -156,14 +170,14 @@ encode_gcode_arr01() {
 }
 # }}}
 # FUNCTION: encode_gcode_24-bit_pack_numbers {{{
-# Takes 24-bit pack numbers and encodes them to base-512
+# Takes 24-bit pack numbers and encodes them to base-715
 # number expressed via 0-9a-zA-Z<Unicode chars>
 #
 encode_gcode_24-bit_pack_numbers() {
     local -a numbers
     numbers=( "$@" )
 
-    local -a nums_base512 workingvar
+    local -a nums_base715 workingvar
     workingvar=( "${numbers[@]}" )
 
     integer all_zero=1 i
@@ -175,9 +189,9 @@ encode_gcode_24-bit_pack_numbers() {
     done
 
     while (( all_zero != 1 )); do
-        div_24-bit_pack_numbers_512 "${workingvar[@]}"
+        div_24-bit_pack_numbers_715 "${workingvar[@]}"
         workingvar=( "${reply[@]}" )
-        nums_base512=( "$REPLY" "${nums_base512[@]}" )
+        nums_base715=( "$REPLY" "${nums_base715[@]}" )
 
         # Check if workingvar is all zero
         all_zero=1
@@ -189,9 +203,9 @@ encode_gcode_24-bit_pack_numbers() {
         done
     done
 
-    # print "Base512 numbers of $str01 are: ${(j:,:)nums_base512[@]}"
-    numbers_to_letters "${nums_base512[@]}" # Result in $REPLY
-    reply=( "${nums_base512[@]}" )          # Additional result
+    # print "Base715 numbers of $str01 are: ${(j:,:)nums_base715[@]}"
+    numbers_to_letters "${nums_base715[@]}" # Result in $REPLY
+    reply=( "${nums_base715[@]}" )          # Additional result
 }
 # }}}
 # FUNCTION: div2 {{{
@@ -224,7 +238,7 @@ div2() {
         integer recovered=$(( quotient*2 ))
         integer subtracted=prepared_for_division-recovered
 
-        prepared_for_division=512*subtracted+input
+        prepared_for_division=715*subtracted+input
     done
 
     #
@@ -284,10 +298,10 @@ arr_01_to_24-bit_pack_numbers() {
     return 0
 }
 # }}}
-# FUNCTION: div_24-bit_pack_numbers_512 {{{
+# FUNCTION: div_24-bit_pack_numbers_715 {{{
 # $1 - series of 0 and 1
 # $reply - ( "series of 0 and 1, result of division" "remainder 0 ... 61" )
-div_24-bit_pack_numbers_512() {
+div_24-bit_pack_numbers_715() {
     local -a numbers
     numbers=( "$@" )
 
@@ -306,11 +320,11 @@ div_24-bit_pack_numbers_512() {
 
     integer prepared_for_division="${numbers[cur]}"
     while (( 1 )); do
-        integer quotient=prepared_for_division/512
+        integer quotient=prepared_for_division/715
 
         result+=( "$quotient" )
 
-        integer recovered=$(( quotient*512 ))
+        integer recovered=$(( quotient*715 ))
         integer subtracted=prepared_for_division-recovered
 
         cur+=1
@@ -334,19 +348,19 @@ div_24-bit_pack_numbers_512() {
     return 0
 }
 # }}}
-# FUNCTION: convert_integer_to_base_512 {{{
+# FUNCTION: convert_integer_to_base_715 {{{
 # Takes number in $1, returns [0-9a-zA-Z<unicode chars>]+
-# - representation of the number in base-512
+# - representation of the number in base-715
 #
-convert_integer_to_base_512() {
+convert_integer_to_base_715() {
     integer number="$1"
     local -a digits
 
     integer new_number=number
     integer remainder
     while (( new_number != 0 )); do
-        remainder=new_number%512
-        new_number=new_number/512
+        remainder=new_number%715
+        new_number=new_number/715
 
         digits+=( "$remainder" )
     done
