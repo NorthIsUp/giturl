@@ -228,7 +228,7 @@ bits_repo() {
 # FUNCTION: bits_site_flags {{{
 bits_site_flags() {
     local -a bits
-    local site="$1" lt
+    local site="$1" proto="$2" lt
 
     reply=()
 
