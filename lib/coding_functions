@@ -47,7 +47,7 @@ process_meta_data() {
         local mat trystr
         while (( 1 )); do
             mat=""
-            for (( trylen=1; trylen <= 7; trylen ++ )); do
+            for (( trylen=6; trylen <= 7; trylen ++ )); do
                 # Take substring of len $trylen and check if
                 # it matches any Huffman code
                 trystr="${strbits[1,trylen]}"
