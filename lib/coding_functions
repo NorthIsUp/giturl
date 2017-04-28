@@ -1,7 +1,7 @@
 # FUNCTION: process_meta_data {{{
 # $1 - bits decoded from gcode
 # $REPLY = bits to skip
-# $reply = ( file "" rev "" repo "" wordrev "" chksum "" site "" site_inline "" flags "" unused1 "" unused3 "" error "" )
+# $reply = ( file "" rev "" repo "" wordrev "" chksum "" site "" site_inline "" flags "" port "" unused1 "" unused3 "" error "" )
 process_meta_data() {
     local -a bits
     bits=( "$@" )
@@ -21,6 +21,7 @@ process_meta_data() {
         site ""
         site_inline ""
         flags ""
+        port ""
         unused1 ""
         unused3 ""
         error ""
@@ -33,7 +34,7 @@ process_meta_data() {
         if [[ "${strbits[1,${#codes[ss]}]}" = "${codes[ss]}" ]]; then
             # We should skip one SS and there is nothing to decode
             REPLY="${#codes[ss]}"
-            reply=( file "" rev "" repo "" wordrev "" chksum "" site "" site_inline "" flags "" unused1 "" unused3 "" error "" )
+            reply=( file "" rev "" repo "" wordrev "" chksum "" site "" site_inline "" flags "" port "" unused1 "" unused3 "" error "" )
             return 0
         fi
 
@@ -58,7 +59,7 @@ process_meta_data() {
             # General failure in decoding the string
             if [[ -z "$mat" ]]; then
                 REPLY="-1"
-                reply=( file "" rev "" repo "" wordrev "" chksum "" site "" site_inline "" flags "" unused1 "" unused3 "" error "" )
+                reply=( file "" rev "" repo "" wordrev "" chksum "" site "" site_inline "" flags "" port "" unused1 "" unused3 "" error "" )
                 return 1
             fi
 
@@ -80,6 +81,15 @@ process_meta_data() {
                     } || {
                         inline=0
                         current_selector="$mat"
+
+                        # Short path for port number - always 16 bits
+                        if [[ "${strbits[1]}" = "1" ]]; then
+                            local port_bits="${strbits[2,17]}"
+                            decoded[port]=$(( [#10] 2#$port_bits ))
+                            strbits="${strbits[18,-1]}"
+                        else
+                            strbits="${strbits[2,-1]}"
+                        fi
                     }
                     ;;
                 (unused2|unused3)
@@ -225,12 +235,26 @@ bits_repo() {
     return 0
 }
 # }}}
-# FUNCTION: bits_site_flags {{{
-bits_site_flags() {
+# FUNCTION: bits_proto_site_port {{{
+bits_proto_site_port() {
     local -a bits
-    local site="$1" proto="$2" lt
+    local proto="$1" site="$2" port="$3" lt
 
     reply=()
+
+    #
+    # Port
+    #
+
+    if [[ -n "$port" ]]; then
+        bits+=( 1 )
+        local bin_port
+        bin_port=$(( [##2] port ))
+        bin_port="${(l:16::0:)bin_port}"
+        bits+=( ${(@s::)bin_port} )
+    else
+        bits+=( 0 )
+    fi
 
     #
     # Flags - the protocol
@@ -338,7 +362,7 @@ bits_remove_if_start_stop() {
 # }}}
 # FUNCTION: build_code {{{
 build_code() {
-    local proto="$1" site="$2" repo="$3" rev="$4" file_path="$5"
+    local proto="$1" site="$2" port="$3" repo="$4" rev="$5" file_path="$6"
 
     local -a bits
     bits=( 0 0 )    # version
@@ -348,7 +372,7 @@ build_code() {
     bits_start
     appendix+=( "${reply[@]}" )
 
-    bits_site_flags "$site" "$proto"
+    bits_proto_site_port "$proto" "$site" "$port"
     appendix+=( "${reply[@]}" )
 
     bits_repo "$repo"

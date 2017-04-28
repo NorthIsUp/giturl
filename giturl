@@ -100,7 +100,7 @@ if (( GU_DECODE == 0 )); then
 
     echo "Protocol: $protocol, User: $user, Site: $site, Port: $port, Repo: $upath"
 
-    build_code "$protocol" "$site" "$upath" "$GU_REVISION" "$GU_PATH"
+    build_code "$protocol" "$site" "$port" "$upath" "$GU_REVISION" "$GU_PATH"
 
     print "Encoded into: gitu://$REPLY"
 else
@@ -126,7 +126,10 @@ else
             else
                 site="${rserver_site[$site]}"
             fi
-            echo "DECODED Protocol: ${mdata[flags]}, site: $site, repo: ${mdata[repo]}, rev: ${mdata[rev]}, path: ${mdata[file]}"
+
+            [[ -z "${mdata[port]}" ]] && mdata[port]="<none>"
+
+            echo "DECODED Protocol: ${mdata[flags]}, site: $site, port: ${mdata[port]}, repo: ${mdata[repo]}, rev: ${mdata[rev]}, path: ${mdata[file]}"
         else
             print "Could not decode, error in given code"
             exit 8
