@@ -98,7 +98,7 @@ if (( GU_DECODE == 0 )); then
         exit 7
     fi
 
-    echo "Protocol: $protocol, User: $user, Site: $site, Port: $port, Repo: $upath"
+    echo "User: $user, Protocol: $protocol, Site: $site, Port: ${port:-<default>}, Repo: $upath, Rev: $GU_REVISION, Path: $GU_PATH"
 
     build_code "$protocol" "$site" "$port" "$upath" "$GU_REVISION" "$GU_PATH"
 
@@ -108,7 +108,7 @@ else
     [[ "$code" = (#b)gitu://(*) ]] && code="${match[1]}"
 
     if [[ "$code" != [0-9a-zA-ZµºÀ-ÖØ-áãäæ-öøú-ɏḀ-Ḵ]## ]]; then
-        print "Error in code. First argument should be gitu://... or just the code (alpha-numeric characters only)"
+        print "Error in code. First argument should be gitu://... or just gcode"
         exit 10
     elif decode_gcode "$code"; then
         local -a bits
