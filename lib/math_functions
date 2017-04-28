@@ -1,7 +1,20 @@
 setopt typesetsilent
 
 local -a characters
-characters=( 0 1 2 3 4 5 6 7 8 9 a b c d e f g h i j k l m n o p q r s t u v w x y z A B C D E F G H I J K L M N O P Q R S T U V W X Y Z )
+characters=( 0 1 2 3 4 5 6 7 8 9 a b c d e f g h i j k l m n o p q r s t u v w x y z A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+
+# Latin-1 Supplement [µºÀ-ÖØ-áãäæ-öøú-ÿ]
+µ º À Á Â Ã Ä Å Æ Ç È É Ê Ë Ì Í Î Ï Ð Ñ Ò Ó Ô Õ Ö Ø Ù Ú Û Ü Ý Þ ß à á ã ä æ ç è é ê ë ì í î ï ð ñ ò ó ô õ ö ø ú û ü ý þ ÿ
+
+# Latin Extended-A [ÿ-ſ]
+Ā ā Ă ă Ą ą Ć ć Ĉ ĉ Ċ ċ Č č Ď ď Đ đ Ē ē Ĕ ĕ Ė ė Ę ę Ě ě Ĝ ĝ Ğ ğ Ġ ġ Ģ ģ Ĥ ĥ Ħ ħ Ĩ ĩ Ī ī Ĭ ĭ Į į İ ı Ĳ ĳ Ĵ ĵ Ķ ķ ĸ Ĺ ĺ Ļ ļ Ľ ľ Ŀ ŀ Ł ł Ń ń
+Ņ ņ Ň ň ŉ Ŋ ŋ Ō ō Ŏ ŏ Ő ő Œ œ Ŕ ŕ Ŗ ŗ Ř ř Ś ś Ŝ ŝ Ş ş Š š Ţ ţ Ť ť Ŧ ŧ Ũ ũ Ū ū Ŭ ŭ Ů ů Ű ű Ų ų Ŵ ŵ Ŷ ŷ Ÿ Ź ź Ż ż Ž ž ſ
+
+# Latin Extended-B [ſ-Ƅ]
+ƀ Ɓ Ƃ ƃ Ƅ
+
+# Character class for all: [0-9a-zA-ZµºÀ-ÖØ-áãäæ-öøú-Ƅ]
+)
 
 # FUNCTION: letters_to_numbers {{{
 # Converts each character of input string into number 0..61
@@ -11,8 +24,8 @@ letters_to_numbers() {
 
     reply=( )
 
-    if [[ "$letters" != [0-9a-zA-Z]## ]]; then
-        print "Incorrect character detected in: '$letters'. Zekylls should consist only from a-z A-Z 0-9 characters"
+    if [[ "$letters" != [0-9a-zA-ZµºÀ-ÖØ-áãäæ-öøú-Ƅ]## ]]; then
+        print "Incorrect character detected in: '$letters'. Gcode should consist only from a-z, A-Z, 0-9 characters, plus 194 unicode characters [µºÀ-ÖØ-áãäæ-öøú-Ƅ]"
         return 1
     fi
 
@@ -27,12 +40,12 @@ letters_to_numbers() {
 }
 # }}}
 # FUNCTION: numbers_to_letters {{{
-# Converts array of numbers into string [0-9a-zA-Z]+
+# Converts array of numbers into string [0-9a-zA-Z<unicode chars>]+
 numbers_to_letters() {
     REPLY=""
     integer i
     for i in "$@"; do
-        if [[ "$i" -lt 0 || "$i" -gt 61 ]]; then
+        if [[ "$i" -lt 0 || "$i" -gt 255 ]]; then
             print "Incorrect number during character conversion: $i"
             return 1
         fi
@@ -59,13 +72,13 @@ decode_gcode() {
     reply=( "${bits[@]}" )
 }
 # }}}
-# FUNCTION: get_integer_from_base_62 {{{
-# Converts given base-62 string into integer
+# FUNCTION: get_integer_from_base_256 {{{
+# Converts given base-256 string into integer
 # Warning: it tagets integer (signed), so
 # the size of number is limited here (while
 # decode_gcode generates series of bits of
 # arbitrary length)
-get_integer_from_base_62() {
+get_integer_from_base_256() {
     local letters="$1"
     local -a bits
     local workingvar="$letters"
@@ -90,8 +103,8 @@ get_integer_from_base_62() {
 }
 # }}}
 # FUNCTION: encode_gcode_str01 {{{
-# Takes string of 0 and 1 and encodes it to
-# base 62 number expressed via 0-9a-zA-Z
+# Takes string of 0 and 1 and encodes it to base-256
+# number expressed via 0-9a-zA-Z<Unicode chars>
 #
 encode_gcode_str01() {
     str_01_to_24-bit_pack_numbers "$1"
@@ -100,8 +113,8 @@ encode_gcode_str01() {
 }
 # }}}
 # FUNCTION: encode_gcode_arr01 {{{
-# Takes array (positional parameters) of 0 and 1 and
-# encodes it to base 62 number expressed via 0-9a-zA-Z
+# Takes array (positional parameters) of 0 and 1 and encodes
+# it to base-256 number expressed via 0-9a-zA-Z<Unicode chars>
 #
 encode_gcode_arr01() {
     arr_01_to_24-bit_pack_numbers "$@"
@@ -109,13 +122,13 @@ encode_gcode_arr01() {
 }
 # }}}
 # FUNCTION: encode_gcode_24-bit_pack_numbers {{{
-# Takes 24-bit pack numbers and encodes them
-# to base 62 number expressed via 0-9a-zA-Z
+# Takes 24-bit pack numbers and encodes them to base-256
+# number expressed via 0-9a-zA-Z<Unicode chars>
 #
 encode_gcode_24-bit_pack_numbers() {
     numbers=( "$@" )
 
-    local -a nums_base62 workingvar
+    local -a nums_base256 workingvar
     workingvar=( "${numbers[@]}" )
 
     integer all_zero=1 i
@@ -127,9 +140,9 @@ encode_gcode_24-bit_pack_numbers() {
     done
 
     while (( all_zero != 1 )); do
-        div_24-bit_pack_numbers_62 "${workingvar[@]}"
+        div_24-bit_pack_numbers_256 "${workingvar[@]}"
         workingvar=( "${reply[@]}" )
-        nums_base62=( "$REPLY" "${nums_base62[@]}" )
+        nums_base256=( "$REPLY" "${nums_base256[@]}" )
 
         # Check if workingvar is all zero
         all_zero=1
@@ -141,9 +154,9 @@ encode_gcode_24-bit_pack_numbers() {
         done
     done
 
-    # print "Base62 numbers of $str01 are: ${(j:,:)nums_base62[@]}"
-    numbers_to_letters "${nums_base62[@]}" # Result in $REPLY
-    reply=( "${nums_base62[@]}" )          # Additional result
+    # print "Base256 numbers of $str01 are: ${(j:,:)nums_base256[@]}"
+    numbers_to_letters "${nums_base256[@]}" # Result in $REPLY
+    reply=( "${nums_base256[@]}" )          # Additional result
 }
 # }}}
 # FUNCTION: div2 {{{
@@ -176,7 +189,7 @@ div2() {
         integer recovered=$(( quotient*2 ))
         integer subtracted=prepared_for_division-recovered
 
-        prepared_for_division=62*subtracted+input
+        prepared_for_division=256*subtracted+input
     done
 
     #
@@ -236,10 +249,10 @@ arr_01_to_24-bit_pack_numbers() {
     return 0
 }
 # }}}
-# FUNCTION: div_24-bit_pack_numbers_62 {{{
+# FUNCTION: div_24-bit_pack_numbers_256 {{{
 # $1 - series of 0 and 1
 # $reply - ( "series of 0 and 1, result of division" "remainder 0 ... 61" )
-div_24-bit_pack_numbers_62() {
+div_24-bit_pack_numbers_256() {
     local -a numbers
     numbers=( "$@" )
 
@@ -258,11 +271,11 @@ div_24-bit_pack_numbers_62() {
 
     integer prepared_for_division="${numbers[cur]}"
     while (( 1 )); do
-        integer quotient=prepared_for_division/62
+        integer quotient=prepared_for_division/256
 
         result+=( "$quotient" )
 
-        integer recovered=$(( quotient*62 ))
+        integer recovered=$(( quotient*256 ))
         integer subtracted=prepared_for_division-recovered
 
         cur+=1
@@ -286,19 +299,19 @@ div_24-bit_pack_numbers_62() {
     return 0
 }
 # }}}
-# FUNCTION: convert_integer_to_base_62 {{{
-# Takes number in $1, returns string [0-9a-zA-Z]+
-# that is representation of the number in base 62
+# FUNCTION: convert_integer_to_base_256 {{{
+# Takes number in $1, returns [0-9a-zA-Z<unicode chars>]+
+# - representation of the number in base-256
 #
-convert_integer_to_base_62() {
+convert_integer_to_base_256() {
     integer number="$1"
     local -a digits
 
     integer new_number=number
     integer remainder
     while (( new_number != 0 )); do
-        remainder=new_number%62
-        new_number=new_number/62
+        remainder=new_number%256
+        new_number=new_number/256
 
         digits+=( "$remainder" )
     done
