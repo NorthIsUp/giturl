@@ -2,9 +2,12 @@ emulate -LR zsh
 
 zmodload zsh/zutil
 
-setopt extendedglob typesetsilent
+setopt extendedglob typesetsilent warncreateglobal
 
 bindkey -e
+
+local REPLY
+local -a reply
 
 builtin autoload -Uz colors
 colors

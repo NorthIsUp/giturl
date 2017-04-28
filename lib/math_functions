@@ -160,6 +160,7 @@ encode_gcode_arr01() {
 # number expressed via 0-9a-zA-Z<Unicode chars>
 #
 encode_gcode_24-bit_pack_numbers() {
+    local -a numbers
     numbers=( "$@" )
 
     local -a nums_base512 workingvar
