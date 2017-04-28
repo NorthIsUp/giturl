@@ -72,7 +72,14 @@ process_meta_data() {
                 (ss)
                     break
                     ;;
-                (file|rev|repo|wordrev|chksum)
+                (repo_rev)
+                    if [[ "$current_selector" = "repo" ]]; then
+                        current_selector="rev"
+                    else
+                        current_selector="repo"
+                    fi
+                    ;;
+                (file|wordrev|chksum)
                     inline=0
                     current_selector="$mat"
                     ;;
@@ -190,7 +197,7 @@ bits_rev() {
 
     # Rev preamble
     if [[ "${#bits}" -gt "0" ]]; then
-        bits=( "${(@s::)codes[rev]}" "${bits[@]}" )
+        bits=( "${(@s::)codes[repo_rev]}" "${bits[@]}" )
     fi
 
     reply=( "${bits[@]}" )
@@ -234,7 +241,7 @@ bits_repo() {
 
     # Repo preamble
     if [[ "${#bits}" -gt "0" ]]; then
-        bits=( "${(@s::)codes[repo]}" "${bits[@]}" )
+        bits=( "${(@s::)codes[repo_rev]}" "${bits[@]}" )
     fi
 
     reply=( "${bits[@]}" )

@@ -4,12 +4,12 @@ local -A codes
 codes=(
 "ss"           "100111"     # start or stop
 "file"         "101000"
-"rev"          "101110"
-"repo"         "101111"
+"repo_rev"     "101111"
 "wordrev"      "101100"
 "chksum"       "101101"
 "site_flags"   "100010"
 "unused1"      "100011"
+"unused2"      "101110"
 "unused3"      "1100110"
 
 ":"            "100000"
@@ -88,12 +88,12 @@ local -A rcodes
 rcodes=(
 "100111"        "ss"
 "101000"        "file"
-"101110"        "rev"
-"101111"        "repo"
+"101111"        "repo_rev"
 "101100"        "wordrev"
 "101101"        "chksum"
 "100010"        "site_flags"
 "100011"        "unused1"
+"101110"        "unused2"
 "1100110"       "unused3"
 
 "100000"        ":"
