@@ -26,7 +26,14 @@ characters=( 0 1 2 3 4 5 6 7 8 9 a b c d e f g h i j k l m n o p q r s t u v w x
 ͻ ͼ ͽ Ά Έ Α Β Γ Δ Ε Ζ Η Θ Ι Κ Λ Μ Ν Ξ Ο Π Ρ Σ Τ Υ Φ Χ Ψ Ω Ϋ ά έ ή ί ΰ α β γ δ ε ζ η θ ι κ λ μ ν ξ ο π ρ ς
 σ τ υ φ χ ψ ϋ ό ύ ώ ϐ ϑ ϒ ϔ ϕ ϖ ϗ Ϙ ϙ Ϛ ϛ Ϝ ϝ Ϟ ϟ Ϡ ϡ Ϣ ϣ Ϥ ϥ Ϧ ϧ Ϩ ϩ Ϫ ϫ Ϭ ϭ Ϯ ϯ ϰ ϱ ϲ ϵ Ϸ ϸ Ϲ ϻ ϼ Ͻ Ͼ Ͽ
 
-# Character class for all: [0-9a-zA-ZµºÀ-ÖØ-áãäæ-öøú-ɏḀ-ỿͻ-ͽΆΈΑ-ΡΣ-ΩΫ-ψϋ-ώϐ-ϒϔ-ϲϵϷ-Ϲϻ-Ͽ]
+# Cyrillic [Ѐ-џѡ-ѣѥ-ѧѪѫѰ-ѷѻѽѿ-ҁҋ-ҥҩ-ҳҵ-һӀ-ӌӎӐ-ӿ]
+Ѐ Ё Ђ Ѓ Є Ѕ І Ї Ј Љ Њ Ћ Ќ Ѝ Ў Џ А Б В Г Д Е Ж З И Й К Л М Н О П Р С Т У Ф Х Ц Ч Ш Щ Ъ Ы Ь Э Ю Я а б в г д
+е ж з и й к л м н о п р с т у ф х ц ч ш щ ъ ы ь э ю я ѐ ё ђ ѓ є ѕ і ї ј љ њ ћ ќ ѝ ў џ ѡ Ѣ ѣ ѥ Ѧ ѧ Ѫ ѫ Ѱ ѱ
+Ѳ ѳ Ѵ ѵ Ѷ ѷ ѻ ѽ ѿ Ҁ ҁ ҋ Ҍ ҍ Ҏ ҏ Ґ ґ Ғ ғ Ҕ ҕ Җ җ Ҙ ҙ Қ қ Ҝ ҝ Ҟ ҟ Ҡ ҡ Ң ң Ҥ ҥ ҩ Ҫ ҫ Ҭ ҭ Ү ү Ұ ұ Ҳ ҳ ҵ Ҷ ҷ Ҹ
+ҹ Һ һ Ӏ Ӂ ӂ Ӄ ӄ Ӆ ӆ Ӈ ӈ Ӊ ӊ Ӌ ӌ ӎ Ӑ ӑ Ӓ ӓ Ӕ ӕ Ӗ ӗ Ә ә Ӛ ӛ Ӝ ӝ Ӟ ӟ Ӡ ӡ Ӣ ӣ Ӥ ӥ Ӧ ӧ Ө ө Ӫ ӫ Ӭ ӭ Ӯ ӯ Ӱ ӱ Ӳ ӳ
+Ӵ ӵ Ӷ ӷ Ӹ ӹ Ӻ ӻ Ӽ ӽ Ӿ ӿ
+
+# Character class for all: [0-9a-zA-ZµºÀ-ÖØ-áãäæ-öøú-ɏḀ-ỿͻ-ͽΆΈΑ-ΡΣ-ΩΫ-ψϋ-ώϐ-ϒϔ-ϲϵϷ-Ϲϻ-ϿЀ-џѡ-ѣѥ-ѧѪѫѰ-ѷѻѽѿ-ҁҋ-ҥҩ-ҳҵ-һӀ-ӌӎӐ-ӿ]
 )
 
 local -A characters_map
@@ -72,7 +79,18 @@ Y 60 Z 61 µ 62 º 63 À 64 Á 65 Â 66 Ã 67 Ä 68 Å 69 Æ 70 Ç 71 È 72 É 7
 λ 760 μ 761 ν 762 ξ 763 ο 764 π 765 ρ 766 ς 767 σ 768 τ 769 υ 770 φ 771 χ 772 ψ 773 ϋ 774 ό 775 ύ 776 ώ 777 ϐ 778 ϑ 779
 ϒ 780 ϔ 781 ϕ 782 ϖ 783 ϗ 784 Ϙ 785 ϙ 786 Ϛ 787 ϛ 788 Ϝ 789 ϝ 790 Ϟ 791 ϟ 792 Ϡ 793 ϡ 794 Ϣ 795 ϣ 796 Ϥ 797 ϥ 798 Ϧ 799
 ϧ 800 Ϩ 801 ϩ 802 Ϫ 803 ϫ 804 Ϭ 805 ϭ 806 Ϯ 807 ϯ 808 ϰ 809 ϱ 810 ϲ 811 ϵ 812 Ϸ 813 ϸ 814 Ϲ 815 ϻ 816 ϼ 817 Ͻ 818 Ͼ 819
-Ͽ 820
+Ͽ 820 Ѐ 821 Ё 822 Ђ 823 Ѓ 824 Є 825 Ѕ 826 І 827 Ї 828 Ј 829 Љ 830 Њ 831 Ћ 832 Ќ 833 Ѝ 834 Ў 835 Џ 836 А 837 Б 838 В 839
+Г 840 Д 841 Е 842 Ж 843 З 844 И 845 Й 846 К 847 Л 848 М 849 Н 850 О 851 П 852 Р 853 С 854 Т 855 У 856 Ф 857 Х 858 Ц 859
+Ч 860 Ш 861 Щ 862 Ъ 863 Ы 864 Ь 865 Э 866 Ю 867 Я 868 а 869 б 870 в 871 г 872 д 873 е 874 ж 875 з 876 и 877 й 878 к 879
+л 880 м 881 н 882 о 883 п 884 р 885 с 886 т 887 у 888 ф 889 х 890 ц 891 ч 892 ш 893 щ 894 ъ 895 ы 896 ь 897 э 898 ю 899
+я 900 ѐ 901 ё 902 ђ 903 ѓ 904 є 905 ѕ 906 і 907 ї 908 ј 909 љ 910 њ 911 ћ 912 ќ 913 ѝ 914 ў 915 џ 916 ѡ 917 Ѣ 918 ѣ 919
+ѥ 920 Ѧ 921 ѧ 922 Ѫ 923 ѫ 924 Ѱ 925 ѱ 926 Ѳ 927 ѳ 928 Ѵ 929 ѵ 930 Ѷ 931 ѷ 932 ѻ 933 ѽ 934 ѿ 935 Ҁ 936 ҁ 937 ҋ 938 Ҍ 939
+ҍ 940 Ҏ 941 ҏ 942 Ґ 943 ґ 944 Ғ 945 ғ 946 Ҕ 947 ҕ 948 Җ 949 җ 950 Ҙ 951 ҙ 952 Қ 953 қ 954 Ҝ 955 ҝ 956 Ҟ 957 ҟ 958 Ҡ 959
+ҡ 960 Ң 961 ң 962 Ҥ 963 ҥ 964 ҩ 965 Ҫ 966 ҫ 967 Ҭ 968 ҭ 969 Ү 970 ү 971 Ұ 972 ұ 973 Ҳ 974 ҳ 975 ҵ 976 Ҷ 977 ҷ 978 Ҹ 979
+ҹ 980 Һ 981 һ 982 Ӏ 983 Ӂ 984 ӂ 985 Ӄ 986 ӄ 987 Ӆ 988 ӆ 989 Ӈ 990 ӈ 991 Ӊ 992 ӊ 993 Ӌ 994 ӌ 995 ӎ 996 Ӑ 997 ӑ 998 Ӓ 999
+ӓ 1000 Ӕ 1001 ӕ 1002 Ӗ 1003 ӗ 1004 Ә 1005 ә 1006 Ӛ 1007 ӛ 1008 Ӝ 1009 ӝ 1010 Ӟ 1011 ӟ 1012 Ӡ 1013 ӡ 1014 Ӣ 1015 ӣ 1016
+Ӥ 1017 ӥ 1018 Ӧ 1019 ӧ 1020 Ө 1021 ө 1022 Ӫ 1023 ӫ 1024 Ӭ 1025 ӭ 1026 Ӯ 1027 ӯ 1028 Ӱ 1029 ӱ 1030 Ӳ 1031 ӳ 1032 Ӵ 1033
+ӵ 1034 Ӷ 1035 ӷ 1036 Ӹ 1037 ӹ 1038 Ӻ 1039 ӻ 1040 Ӽ 1041 ӽ 1042 Ӿ 1043 ӿ 1044
 )
 
 # FUNCTION: letters_to_numbers {{{
@@ -83,8 +101,8 @@ letters_to_numbers() {
 
     reply=( )
 
-    if [[ "$letters" != [0-9a-zA-ZµºÀ-ÖØ-áãäæ-öøú-ɏḀ-ỿͻ-ͽΆΈΑ-ΡΣ-ΩΫ-ψϋ-ώϐ-ϒϔ-ϲϵϷ-Ϲϻ-Ͽ]## ]]; then
-        print "Incorrect character detected in: '$letters'. Gcode should consist only from a-z, A-Z, 0-9 characters, plus 759 unicode characters [µºÀ-ÖØ-áãäæ-öøú-ɏḀ-ỿͻ-ͽΆΈΑ-ΡΣ-ΩΫ-ψϋ-ώϐ-ϒϔ-ϲϵϷ-Ϲϻ-Ͽ]"
+    if [[ "$letters" != [0-9a-zA-ZµºÀ-ÖØ-áãäæ-öøú-ɏḀ-ỿͻ-ͽΆΈΑ-ΡΣ-ΩΫ-ψϋ-ώϐ-ϒϔ-ϲϵϷ-Ϲϻ-ϿЀ-џѡ-ѣѥ-ѧѪѫѰ-ѷѻѽѿ-ҁҋ-ҥҩ-ҳҵ-һӀ-ӌӎӐ-ӿ]## ]]; then
+        print "Incorrect character detected in: '$letters'. Gcode should consist only from a-z, A-Z, 0-9 characters, plus 759 unicode characters [µºÀ-ÖØ-áãäæ-öøú-ɏḀ-ỿͻ-ͽΆΈΑ-ΡΣ-ΩΫ-ψϋ-ώϐ-ϒϔ-ϲϵϷ-Ϲϻ-ϿЀ-џѡ-ѣѥ-ѧѪѫѰ-ѷѻѽѿ-ҁҋ-ҥҩ-ҳҵ-һӀ-ӌӎӐ-ӿ]"
         return 1
     fi
 
@@ -103,7 +121,7 @@ numbers_to_letters() {
     REPLY=""
     integer i
     for i in "$@"; do
-        if [[ "$i" -lt 0 || "$i" -gt 820 ]]; then
+        if [[ "$i" -lt 0 || "$i" -gt 1023 ]]; then
             print "Incorrect number during character conversion: $i"
             return 1
         fi
@@ -130,13 +148,13 @@ decode_gcode() {
     reply=( "${bits[@]}" )
 }
 # }}}
-# FUNCTION: get_integer_from_base_821 {{{
-# Converts given base-821 string into integer
+# FUNCTION: get_integer_from_base_1024 {{{
+# Converts given base-1024 string into integer
 # Warning: it tagets integer (signed), so
 # the size of number is limited here (while
 # decode_gcode generates series of bits of
 # arbitrary length)
-get_integer_from_base_821() {
+get_integer_from_base_1024() {
     local letters="$1"
     local -a bits
     local workingvar="$letters"
@@ -161,7 +179,7 @@ get_integer_from_base_821() {
 }
 # }}}
 # FUNCTION: encode_gcode_str01 {{{
-# Takes string of 0 and 1 and encodes it to base-821
+# Takes string of 0 and 1 and encodes it to base-1024
 # number expressed via 0-9a-zA-Z<Unicode chars>
 #
 encode_gcode_str01() {
@@ -172,7 +190,7 @@ encode_gcode_str01() {
 # }}}
 # FUNCTION: encode_gcode_arr01 {{{
 # Takes array (positional parameters) of 0 and 1 and encodes
-# it to base-821 number expressed via 0-9a-zA-Z<Unicode chars>
+# it to base-1024 number expressed via 0-9a-zA-Z<Unicode chars>
 #
 encode_gcode_arr01() {
     arr_01_to_24-bit_pack_numbers "$@"
@@ -180,14 +198,14 @@ encode_gcode_arr01() {
 }
 # }}}
 # FUNCTION: encode_gcode_24-bit_pack_numbers {{{
-# Takes 24-bit pack numbers and encodes them to base-821
+# Takes 24-bit pack numbers and encodes them to base-1024
 # number expressed via 0-9a-zA-Z<Unicode chars>
 #
 encode_gcode_24-bit_pack_numbers() {
     local -a numbers
     numbers=( "$@" )
 
-    local -a nums_base821 workingvar
+    local -a nums_base1024 workingvar
     workingvar=( "${numbers[@]}" )
 
     integer all_zero=1 i
@@ -199,9 +217,9 @@ encode_gcode_24-bit_pack_numbers() {
     done
 
     while (( all_zero != 1 )); do
-        div_24-bit_pack_numbers_821 "${workingvar[@]}"
+        div_24-bit_pack_numbers_1024 "${workingvar[@]}"
         workingvar=( "${reply[@]}" )
-        nums_base821=( "$REPLY" "${nums_base821[@]}" )
+        nums_base1024=( "$REPLY" "${nums_base1024[@]}" )
 
         # Check if workingvar is all zero
         all_zero=1
@@ -213,9 +231,9 @@ encode_gcode_24-bit_pack_numbers() {
         done
     done
 
-    # print "Base821 numbers of $str01 are: ${(j:,:)nums_base821[@]}"
-    numbers_to_letters "${nums_base821[@]}" # Result in $REPLY
-    reply=( "${nums_base821[@]}" )          # Additional result
+    # print "Base1024 numbers of $str01 are: ${(j:,:)nums_base1024[@]}"
+    numbers_to_letters "${nums_base1024[@]}" # Result in $REPLY
+    reply=( "${nums_base1024[@]}" )          # Additional result
 }
 # }}}
 # FUNCTION: div2 {{{
@@ -248,7 +266,7 @@ div2() {
         integer recovered=$(( quotient*2 ))
         integer subtracted=prepared_for_division-recovered
 
-        prepared_for_division=821*subtracted+input
+        prepared_for_division=1024*subtracted+input
     done
 
     #
@@ -308,10 +326,10 @@ arr_01_to_24-bit_pack_numbers() {
     return 0
 }
 # }}}
-# FUNCTION: div_24-bit_pack_numbers_821 {{{
+# FUNCTION: div_24-bit_pack_numbers_1024 {{{
 # $1 - series of 0 and 1
 # $reply - ( "series of 0 and 1, result of division" "remainder 0 ... 61" )
-div_24-bit_pack_numbers_821() {
+div_24-bit_pack_numbers_1024() {
     local -a numbers
     numbers=( "$@" )
 
@@ -330,11 +348,11 @@ div_24-bit_pack_numbers_821() {
 
     integer prepared_for_division="${numbers[cur]}"
     while (( 1 )); do
-        integer quotient=prepared_for_division/821
+        integer quotient=prepared_for_division/1024
 
         result+=( "$quotient" )
 
-        integer recovered=$(( quotient*821 ))
+        integer recovered=$(( quotient*1024 ))
         integer subtracted=prepared_for_division-recovered
 
         cur+=1
@@ -358,19 +376,19 @@ div_24-bit_pack_numbers_821() {
     return 0
 }
 # }}}
-# FUNCTION: convert_integer_to_base_821 {{{
+# FUNCTION: convert_integer_to_base_1024 {{{
 # Takes number in $1, returns [0-9a-zA-Z<unicode chars>]+
-# - representation of the number in base-821
+# - representation of the number in base-1024
 #
-convert_integer_to_base_821() {
+convert_integer_to_base_1024() {
     integer number="$1"
     local -a digits
 
     integer new_number=number
     integer remainder
     while (( new_number != 0 )); do
-        remainder=new_number%821
-        new_number=new_number/821
+        remainder=new_number%1024
+        new_number=new_number/1024
 
         digits+=( "$remainder" )
     done
