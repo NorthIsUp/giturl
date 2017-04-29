@@ -107,7 +107,7 @@ else
     local code="$1"
     [[ "$code" = (#b)gitu://(*) ]] && code="${match[1]}"
 
-    if [[ "$code" != [0-9a-zA-ZµºÀ-ÖØ-áãäæ-öøú-ɏḀ-ỿͻ-ͽΆΈΑ-ΡΣ-ΩΫ-ψϋ-ώϐ-ϒϔ-ϲϵϷ-Ϲϻ-ϿЀ-џѡ-ѣѥ-ѧѪѫѰ-ѷѻѽѿ-ҁҋ-ҥҩ-ҳҵ-һӀ-ӌӎӐ-ӿ]## ]]; then
+    if [[ "$code" != [0-9a-zA-ZµºÀ-ÖØ-áãäæ-öøú-ǃǍ-Ǳǳ-Ɉɋ-ɏḀ-ẝẟ-ỹỻͻ-ͽΆΈΑ-ΡΣ-ΩΫ-ψϋ-ώϐ-ϒϔ-Ϡϥϧ-ϩϫ-ϲϵϷ-Ϲϻ-ϿЀ-џѡ-ѣѥ-ѧѪѫѰ-ѷѻѽѿ-ҁҋ-ҥҩ-ҳҵ-һӀ-ӌӎӐ-ӿא-ד]## ]]; then
         print "Error in code. First argument should be gitu://... or just gcode"
         exit 10
     elif decode_gcode "$code"; then
