@@ -1,7 +1,7 @@
 # FUNCTION: process_meta_data {{{
 # $1 - bits decoded from gcode
 # $REPLY = bits to skip
-# $reply = ( file "" rev "" repo "" wordrev "" chksum "" proto "" site "" site_inline "" flags "" port "" unused1 "" unused3 "" error "" )
+# $reply = ( file "" rev "" repo "" wordrev "" proto "" site "" site_inline "" flags "" port "" unused1 "" unused2 "" unused3 ""  unused4 "" error "" )
 process_meta_data() {
     local -a bits
     bits=( "$@" )
@@ -17,14 +17,15 @@ process_meta_data() {
         rev ""
         repo ""
         wordrev ""
-        chksum ""
         proto ""
         site ""
         site_inline ""
         flags ""
         port ""
         unused1 ""
+        unused2 ""
         unused3 ""
+        unused4 ""
         error ""
     )
 
@@ -35,7 +36,7 @@ process_meta_data() {
         if [[ "${strbits[1,${#codes[ss]}]}" = "${codes[ss]}" ]]; then
             # We should skip one SS and there is nothing to decode
             REPLY="${#codes[ss]}"
-            reply=( file "" rev "" repo "" wordrev "" chksum "" proto "" site "" site_inline "" flags "" port "" unused1 "" unused3 "" error "" )
+            reply=( file "" rev "" repo "" wordrev "" proto "" site "" site_inline "" flags "" port "" unused1 ""  unused2 "" unused3 ""  unused4 "" error "" )
             return 0
         fi
 
@@ -60,7 +61,7 @@ process_meta_data() {
             # General failure in decoding the string
             if [[ -z "$mat" ]]; then
                 REPLY="-1"
-                reply=( file "" rev "" repo "" wordrev "" chksum "" proto "" site "" site_inline "" flags "" port "" unused1 "" unused3 "" error "" )
+                reply=( file "" rev "" repo "" wordrev "" proto "" site "" site_inline "" flags "" port "" unused1 "" unused2 "" unused3 "" unused4 "" error "" )
                 return 1
             fi
 
@@ -79,7 +80,7 @@ process_meta_data() {
                         current_selector="repo"
                     fi
                     ;;
-                (file|wordrev|chksum)
+                (file|wordrev)
                     inline=0
                     current_selector="$mat"
                     ;;
@@ -105,7 +106,7 @@ process_meta_data() {
                         strbits="${strbits[4,-1]}"
                     }
                     ;;
-                (unused2|unused3)
+                (unused1|unused2|unused3|unused4)
                     inline=0
                     current_selector="$mat"
                     ;;
@@ -135,7 +136,7 @@ process_meta_data() {
     else
         # No meta data and no special ending of zekyll bits
         REPLY="0"
-        reply=( file "" rev "" repo "" wordrev "" chksum "" proto "" site "" site_inline "" flags "" port "" unused1 "" unused3 "" error "" )
+        reply=( file "" rev "" repo "" wordrev "" proto "" site "" site_inline "" flags "" port "" unused1 "" unused2 "" unused3 "" unused4 "" error "" )
     fi
 
     return 0
@@ -153,7 +154,7 @@ get_code_data() {
     bits=( "${reply[@]}" )
 
     process_meta_data "${bits[@]}"
-    # $reply contains: ( file "" rev "" repo "" wordrev "" chksum "" site_flags "" unused1 "" unused3 "" error "" )
+    # $reply contains: ( file "" rev "" repo "" wordrev "" proto "" site "" site_inline "" flags "" port "" unused1 "" unused2 "" unused3 ""  unused4 "" error "" )
     # $REPLY contains: number of final bits that contained the meta data
     local -a meta_reply
     meta_reply=( "${reply[@]}" )

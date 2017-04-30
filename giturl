@@ -115,7 +115,7 @@ else
         bits=( "${reply[@]}" )
 
         if process_meta_data "${bits[@]}"; then
-            # $reply = ( file "" rev "" repo "" wordrev "" chksum "" proto "" site "" site_inline "" flags "" port "" unused1 "" unused3 "" error "" )
+            # $reply = ( file "" rev "" repo "" wordrev "" proto "" site "" site_inline "" flags "" port "" unused1 "" unused2 "" unused3 ""  unused4 "" error "" )
             local -A mdata
             mdata=( "${reply[@]}" )
 
