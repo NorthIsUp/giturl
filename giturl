@@ -28,6 +28,8 @@ zparseopts -E -D -A opthash h -help v -verbose q -quiet n -noansi p: -path: r: -
 (( ${+opthash[-r]} ))                           && GU_REVISION=${opthash[-r]}
 (( ${+opthash[--revision]} ))                   && GU_REVISION=${opthash[--revision]}
 
+(( GU_NOANSI )) && { colors=(); fg=(); bg=(); reset_color=""; }
+
 if (( GU_DECODE == 0 )); then
     local protocol user site port upath
 
@@ -98,11 +100,13 @@ if (( GU_DECODE == 0 )); then
         exit 7
     fi
 
-    echo "User: $user, Protocol: $protocol, Site: $site, Port: ${port:-<default>}, Repo: $upath, Rev: $GU_REVISION, Path: $GU_PATH"
+    print
+    PresentData "$protocol" "$user" "$site" "$port" "$upath" "$GU_REVISION" "$GU_PATH"
 
     build_code "$protocol" "$site" "$port" "$upath" "$GU_REVISION" "$GU_PATH"
 
-    print "Encoded into: gitu://$REPLY"
+    print
+    print $fg[magenta]"gitu://$REPLY"$reset_color
 else
     local code="$1"
     [[ "$code" = (#b)gitu://(*) ]] && code="${match[1]}"
@@ -127,9 +131,9 @@ else
                 site="${rserver_site[$site]}"
             fi
 
-            [[ -z "${mdata[port]}" ]] && mdata[port]="<none>"
+            [[ -z "${mdata[port]}" ]] && mdata[port]="<default>"
 
-            echo "DECODED Protocol: ${mdata[proto]}, site: $site, port: ${mdata[port]}, repo: ${mdata[repo]}, rev: ${mdata[rev]}, path: ${mdata[file]}"
+            PresentData "${mdata[proto]}" "" "$site" "${mdata[port]}" "${mdata[repo]}" "${mdata[rev]}" "${mdata[file]}"
         else
             print "Could not decode, error in given code"
             exit 8
