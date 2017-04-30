@@ -131,8 +131,6 @@ else
                 site="${rserver_site[$site]}"
             fi
 
-            [[ -z "${mdata[port]}" ]] && mdata[port]="<default>"
-
             PresentData "${mdata[proto]}" "" "$site" "${mdata[port]}" "${mdata[repo]}" "${mdata[rev]}" "${mdata[file]}"
         else
             print "Could not decode, error in given code"

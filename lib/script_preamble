@@ -20,14 +20,14 @@ SetMessage() {
 
 # FUNCTION: PresentData {{{
 PresentData() {
-    local proto="$1" user="$2" site="$3" port="${4:-<default>}" upath="$5" rev="$6" file="$7"
+    local proto="$1" user="$2" site="$3" port="$4" upath="$5" rev="$6" file="$7"
     print "$fg[green]Protocol:$reset_color $proto"
-    print "$fg[green]User:$reset_color     $user"
+    [[ -n "$user" ]] && print "$fg[green]User:$reset_color     $user"
     print "$fg[green]Site:$reset_color     $site"
-    print "$fg[green]Port:$reset_color     $port"
+    [[ -n "$port" ]] && print "$fg[green]Port:$reset_color     $port"
     print "$fg[yellow]Repo:$reset_color     $upath"
-    print "$fg[yellow]Revision:$reset_color $rev"
-    print "$fg[red]File:$reset_color     $file"
+    [[ -n "$rev" ]] && print "$fg[yellow]Revision:$reset_color $rev"
+    [[ -n "$file" ]] && print "$fg[red]File:$reset_color     $file"
 }
 # }}}
 
