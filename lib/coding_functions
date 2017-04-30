@@ -1,7 +1,7 @@
 # FUNCTION: process_meta_data {{{
 # $1 - bits decoded from gcode
 # $REPLY = bits to skip
-# $reply = ( file "" rev "" repo "" wordrev "" proto "" site "" site_inline "" flags "" port "" unused1 "" unused2 "" unused3 ""  unused4 "" error "" )
+# $reply = ( file "" rev "" repo "" wordrev "" proto "" user "" site "" site_inline "" flags "" port "" unused1 "" unused2 "" unused3 ""  unused4 "" error "" )
 process_meta_data() {
     local -a bits
     bits=( "$@" )
@@ -18,6 +18,7 @@ process_meta_data() {
         repo ""
         wordrev ""
         proto ""
+        user ""
         site ""
         site_inline ""
         flags ""
@@ -36,7 +37,7 @@ process_meta_data() {
         if [[ "${strbits[1,${#codes[ss]}]}" = "${codes[ss]}" ]]; then
             # We should skip one SS and there is nothing to decode
             REPLY="${#codes[ss]}"
-            reply=( file "" rev "" repo "" wordrev "" proto "" site "" site_inline "" flags "" port "" unused1 ""  unused2 "" unused3 ""  unused4 "" error "" )
+            reply=( file "" rev "" repo "" wordrev "" proto "" user "" site "" site_inline "" flags "" port "" unused1 ""  unused2 "" unused3 ""  unused4 "" error "" )
             return 0
         fi
 
@@ -61,7 +62,7 @@ process_meta_data() {
             # General failure in decoding the string
             if [[ -z "$mat" ]]; then
                 REPLY="-1"
-                reply=( file "" rev "" repo "" wordrev "" proto "" site "" site_inline "" flags "" port "" unused1 "" unused2 "" unused3 "" unused4 "" error "" )
+                reply=( file "" rev "" repo "" wordrev "" proto "" user "" site "" site_inline "" flags "" port "" unused1 "" unused2 "" unused3 "" unused4 "" error "" )
                 return 1
             fi
 
@@ -73,9 +74,11 @@ process_meta_data() {
                 (ss)
                     break
                     ;;
-                (repo_rev)
+                (repo_rev_usr)
                     if [[ "$current_selector" = "repo" ]]; then
                         current_selector="rev"
+                    elif [[ "$current_selector" = "rev" ]]; then
+                        current_selector="user"
                     else
                         current_selector="repo"
                     fi
@@ -136,7 +139,7 @@ process_meta_data() {
     else
         # No meta data and no special ending of zekyll bits
         REPLY="0"
-        reply=( file "" rev "" repo "" wordrev "" proto "" site "" site_inline "" flags "" port "" unused1 "" unused2 "" unused3 "" unused4 "" error "" )
+        reply=( file "" rev "" repo "" wordrev "" proto "" user "" site "" site_inline "" flags "" port "" unused1 "" unused2 "" unused3 "" unused4 "" error "" )
     fi
 
     return 0
@@ -154,7 +157,7 @@ get_code_data() {
     bits=( "${reply[@]}" )
 
     process_meta_data "${bits[@]}"
-    # $reply contains: ( file "" rev "" repo "" wordrev "" proto "" site "" site_inline "" flags "" port "" unused1 "" unused2 "" unused3 ""  unused4 "" error "" )
+    # $reply contains: ( file "" rev "" repo "" wordrev "" proto "" user "" site "" site_inline "" flags "" port "" unused1 "" unused2 "" unused3 ""  unused4 "" error "" )
     # $REPLY contains: number of final bits that contained the meta data
     local -a meta_reply
     meta_reply=( "${reply[@]}" )
@@ -198,7 +201,29 @@ bits_rev() {
 
     # Rev preamble
     if [[ "${#bits}" -gt "0" ]]; then
-        bits=( "${(@s::)codes[repo_rev]}" "${bits[@]}" )
+        bits=( "${(@s::)codes[repo_rev_usr]}" "${bits[@]}" )
+    fi
+
+    reply=( "${bits[@]}" )
+    return 0
+}
+# }}}
+# FUNCTION: bits_user {{{
+bits_user() {
+    local -a bits
+    local user="$1"
+
+    for lt in "${(@s::)user}"; do
+        if [[ -n "${codes[$lt]}" ]];then
+            bits+=( "${(@s::)codes[$lt]}" )
+        elif [[ -n "$lt" ]]; then
+            SetMessage "Incorrect character in user name: '$lt', trying to continue"
+        fi
+    done
+
+    # Rev preamble
+    if [[ "${#bits}" -gt "0" ]]; then
+        bits=( "${(@s::)codes[repo_rev_usr]}" "${bits[@]}" )
     fi
 
     reply=( "${bits[@]}" )
@@ -242,7 +267,7 @@ bits_repo() {
 
     # Repo preamble
     if [[ "${#bits}" -gt "0" ]]; then
-        bits=( "${(@s::)codes[repo_rev]}" "${bits[@]}" )
+        bits=( "${(@s::)codes[repo_rev_usr]}" "${bits[@]}" )
     fi
 
     reply=( "${bits[@]}" )
@@ -377,7 +402,7 @@ bits_remove_if_start_stop() {
 # }}}
 # FUNCTION: build_code {{{
 build_code() {
-    local proto="$1" site="$2" port="$3" repo="$4" rev="$5" file_path="$6"
+    local proto="$1" user="$2" site="$3" port="$4" repo="$5" rev="$6" file_path="$7"
 
     local -a bits
     bits=( 0 0 )    # version
@@ -390,10 +415,19 @@ build_code() {
     bits_proto_site_port "$proto" "$site" "$port"
     appendix+=( "${reply[@]}" )
 
+    # Repo is ensured to be always appended, even if somehow
+    # empty (should not happen)
     bits_repo "$repo"
-    appendix+=( "${reply[@]}" )
+    [[ "${#reply}" -gt 0 ]] && appendix+=( "${reply[@]}" ) || appendix+=( "${(@s::)codes[repo_rev_usr]}" )
 
+    # Rev is always appended even if empty, the rationale is
+    # that without rev, url will be probably (...) short anyway.
+    # Also, the main motivation to use giturl is to embed revision
     bits_rev "$rev"
+    [[ "${#reply}" -gt 0 ]] && appendix+=( "${reply[@]}" ) || appendix+=( "${(@s::)codes[repo_rev_usr]}" )
+
+    # User is normal, optional
+    bits_user "$user"
     appendix+=( "${reply[@]}" )
 
     bits_path "$file_path"

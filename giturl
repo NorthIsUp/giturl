@@ -103,7 +103,7 @@ if (( GU_DECODE == 0 )); then
     print
     PresentData "$protocol" "$user" "$site" "$port" "$upath" "$GU_REVISION" "$GU_PATH"
 
-    build_code "$protocol" "$site" "$port" "$upath" "$GU_REVISION" "$GU_PATH"
+    build_code "$protocol" "$user" "$site" "$port" "$upath" "$GU_REVISION" "$GU_PATH"
 
     print
     print $fg[magenta]"gitu://$REPLY"$reset_color
@@ -131,7 +131,7 @@ else
                 site="${rserver_site[$site]}"
             fi
 
-            PresentData "${mdata[proto]}" "" "$site" "${mdata[port]}" "${mdata[repo]}" "${mdata[rev]}" "${mdata[file]}"
+            PresentData "${mdata[proto]}" "${mdata[user]}" "$site" "${mdata[port]}" "${mdata[repo]}" "${mdata[rev]}" "${mdata[file]}"
         else
             print "Could not decode, error in given code"
             exit 8
