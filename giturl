@@ -111,8 +111,8 @@ else
     local code="$1"
     [[ "$code" = (#b)gitu://(*) ]] && code="${match[1]}"
 
-    if [[ "$code" != [0-9a-zA-ZµºÀ-ÖØ-áãäæ-öøú-ǃǍ-Ǳǳ-Ɉɋ-ɏḀ-ẝẟ-ỹỻͻ-ͽΆΈΑ-ΡΣ-ΩΫ-ψϋ-ώϐ-ϒϔ-Ϡϥϧ-ϩϫ-ϲϵϷ-Ϲϻ-ϿЀ-џѡ-ѣѥѫѱ-ѳѵѷѻѽѿ-ҁҋ-ҟҡ-ҥҩ-ҳҵ-һӀ-ӌӎӐ-ӿא-דטך-מ]## ]]; then
-        print "${fg[red]}Error in code. First argument should be gitu://... or just gcode (with proper characters: 0-9 a-z A-Z [µºÀ-ÖØ-áãäæ-öøú-ǃǍ-Ǳǳ-Ɉɋ-ɏḀ-ẝẟ-ỹỻͻ-ͽΆΈΑ-ΡΣ-ΩΫ-ψϋ-ώϐ-ϒϔ-Ϡϥϧ-ϩϫ-ϲϵϷ-Ϲϻ-ϿЀ-џѡ-ѣѥѫѱ-ѳѵѷѻѽѿ-ҁҋ-ҟҡ-ҥҩ-ҳҵ-һӀ-ӌӎӐ-ӿא-דטך-מ])${reset_color}"
+    if [[ "$code" != [0-9a-zA-ZµºÀ-ÖØ-áãäæ-öøú-ƔƖ-ơƤ-ǃǍ-Ǳǳ-ǵǷ-Ɉɋ-ɏḀ-ẝẟ-ỹỻͻ-ͽΆΈΑ-ΡΣ-ΩΫ-ψϋ-ώϐ-ϒϔ-Ϡϥϧ-ϩϫ-ϲϵϷ-Ϲϻ-ϿЀ-џѡ-ѣѥѫѱ-ѳѵѷѻѽѿ-ҁҋ-ҟҡ-ҥҩ-ҳҵ-һӀ-ӌӎӐ-ӿא-דטך-מס-פ]## ]]; then
+        print "${fg[red]}Error in code. First argument should be gitu://... or just gcode (with proper characters: 0-9 a-z A-Z [µºÀ-ÖØ-áãäæ-öøú-ƔƖ-ơƤ-ǃǍ-Ǳǳ-ǵǷ-Ɉɋ-ɏḀ-ẝẟ-ỹỻͻ-ͽΆΈΑ-ΡΣ-ΩΫ-ψϋ-ώϐ-ϒϔ-Ϡϥϧ-ϩϫ-ϲϵϷ-Ϲϻ-ϿЀ-џѡ-ѣѥѫѱ-ѳѵѷѻѽѿ-ҁҋ-ҟҡ-ҥҩ-ҳҵ-һӀ-ӌӎӐ-ӿא-דטך-מס-פ])${reset_color}"
         exit 10
     elif decode_gcode "$code"; then
         local -a bits
