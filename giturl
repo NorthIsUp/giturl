@@ -112,7 +112,7 @@ else
     [[ "$code" = (#b)gitu://(*) ]] && code="${match[1]}"
 
     if [[ "$code" != [0-9a-zA-ZµºÀ-ÖØ-áãäæ-öøú-ǃǍ-Ǳǳ-Ɉɋ-ɏḀ-ẝẟ-ỹỻͻ-ͽΆΈΑ-ΡΣ-ΩΫ-ψϋ-ώϐ-ϒϔ-Ϡϥϧ-ϩϫ-ϲϵϷ-Ϲϻ-ϿЀ-џѡ-ѣѥѫѱ-ѳѵѷѻѽѿ-ҁҋ-ҟҡ-ҥҩ-ҳҵ-һӀ-ӌӎӐ-ӿא-דטך-מ]## ]]; then
-        print "Error in code. First argument should be gitu://... or just gcode"
+        print "${fg[red]}Error in code. First argument should be gitu://... or just gcode (with proper characters: 0-9 a-z A-Z [µºÀ-ÖØ-áãäæ-öøú-ǃǍ-Ǳǳ-Ɉɋ-ɏḀ-ẝẟ-ỹỻͻ-ͽΆΈΑ-ΡΣ-ΩΫ-ψϋ-ώϐ-ϒϔ-Ϡϥϧ-ϩϫ-ϲϵϷ-Ϲϻ-ϿЀ-џѡ-ѣѥѫѱ-ѳѵѷѻѽѿ-ҁҋ-ҟҡ-ҥҩ-ҳҵ-һӀ-ӌӎӐ-ӿא-דטך-מ])${reset_color}"
         exit 10
     elif decode_gcode "$code"; then
         local -a bits
@@ -133,11 +133,11 @@ else
 
             PresentData "${mdata[proto]}" "${mdata[user]}" "$site" "${mdata[port]}" "${mdata[repo]}" "${mdata[rev]}" "${mdata[file]}"
         else
-            print "Could not decode, error in given code"
+            print "${fg[red]}Could not decode, error in given code${reset_color}"
             exit 8
         fi
     else
-        print "Error in code. First argument should be gitu://... or just the code (alpha-numeric characters only)"
+        print "${fg[red]}Error in code. First argument should be gitu://... or just the code (alpha-numeric characters only)${reset_color}"
         exit 9
     fi
 fi
