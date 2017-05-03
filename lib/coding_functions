@@ -75,6 +75,7 @@ process_meta_data() {
                     break
                     ;;
                 (repo_rev_usr)
+                    inline=0
                     if [[ "$current_selector" = "repo" ]]; then
                         current_selector="rev"
                     elif [[ "$current_selector" = "rev" ]]; then
