@@ -119,7 +119,7 @@ process_meta_data() {
                         if (( inline )); then
                             decoded[site_inline]+="$mat"
                         else
-                            if [[ ${characters[(i)$mat]} -gt ${characters[(i)3]} ]]; then
+                            if [[ ${input_characters[(i)$mat]} -gt ${input_characters[(i)3]} ]]; then
                                 mat="${rsites_flags[$mat]}"
                                 [[ -n "${decoded[flags]}" ]] && decoded[flags]+=","
                                 decoded[flags]+="$mat"
