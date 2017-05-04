@@ -82,7 +82,7 @@ if (( GU_DECODE == 0 )); then
     elif [[ "$1" != (rsync|git|http|https|ftp|ftps|ssh)://* && $1 = (#b)([^/:]##)://* ]]; then
         print "Unsupported protocol: ${match[1]}"
         exit 5
-    elif [[ "$1" != (rsync|git|http|https|ftp|ftps|ssh)://* && "$1" = (#b)([^@]##@)(#c0,1)([^:]##):(*?) ]]; then
+    elif [[ "$1" != (rsync|git|http|https|ftp|ftps|ssh)://* && "$1" = (#b)([^@/]##@)(#c0,1)([^:]##):(*?) ]]; then
         if [[ -n "${match[1]}" && "${match[1]}" != [a-zA-Z0-9._~-]##@ ]]; then
             print "Forbidden characters used in user name, allowed are [a-zA-Z0-9._~-]"
             print "Obtained user name: ${match[1]%@}"
