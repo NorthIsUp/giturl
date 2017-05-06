@@ -459,6 +459,7 @@ build_code() {
     else
         appendix=( "${(Oa)appendix[@]}" )
         bits=( "${bits[@]}" "${appendix[@]}" )
+        # print "${(j::)bits}"
     fi
 
     encode_gcode_arr01 "${bits[@]}"
