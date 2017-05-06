@@ -32,7 +32,8 @@ Compare length of the above data to the `gcode` in URL:
 https://github.com/zdharma/giturldevellib/coding_functions.cpp
 ```
 
-It is `29` vs `62` characters.
+It is `29` vs `62` characters, and you would normally need additional description like "the branch
+is: ", etc. Giturl allows to easily grab repository data from web page and terminal.
 
 # Limitations
 Only following characters can appear in input data – in the server, repository path, revision, etc.: `[a-zA-Z0-9._~:-]`
