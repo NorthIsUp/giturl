@@ -22,7 +22,20 @@ File:     lib/coding_functions.cpp
 ```
 
 This is Zsh implementation. You don't have to use Zsh as your shell, just have it installed,
-like Ruby. There is [`C++11` implementation too.](https://github.com/zdharma/cgiturl).
+like Ruby. There is [`C++11` implementation too](https://github.com/zdharma/cgiturl).
+
+The resulting URL is highly compressed thanks to use of Huffman codes and base-1024 encoding.
+Compare length of the above data to the `gcode` in URL:
+
+```
+ŬṽǚǫoŒẗ6ẏȅcЭÑẩőn4ầŘїệαЃȣϟṈӛŀї
+https://github.com/zdharma/giturldevellib/coding_functions.cpp
+```
+
+It is `29` vs `62` characters.
+
+# Limitations
+Only following characters can appear in input data – in the server, repository path, revision, etc.: `[a-zA-Z0-9._~:-]`
 
 # Characters used in base-1024 encoding
 
