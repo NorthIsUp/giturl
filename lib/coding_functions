@@ -51,27 +51,32 @@ process_meta_data() {
 
         # keys of the 'decoded' hash
         local current_selector="error"
-        integer trylen
+        integer trylen first=1
         local mat trystr
         while (( 1 )); do
-            mat=""
-            for (( trylen=6; trylen <= 7; trylen ++ )); do
-                # Take substring of len $trylen and check if
-                # it matches any Huffman code
-                trystr="${strbits[1,trylen]}"
-                mat="${rcodes[$trystr]}"
-                [ -n "$mat" ] && break
-            done
+            if (( first )); then
+                mat="site_flags"
+                first=0
+            else
+                mat=""
+                for (( trylen=6; trylen <= 7; trylen ++ )); do
+                    # Take substring of len $trylen and check if
+                    # it matches any Huffman code
+                    trystr="${strbits[1,trylen]}"
+                    mat="${rcodes[$trystr]}"
+                    [ -n "$mat" ] && break
+                done
 
-            # General failure in decoding the string
-            if [[ -z "$mat" ]]; then
-                REPLY="-1"
-                reply=( file "" rev "" repo "" wordrev "" proto "" user "" site "" site_inline "" flags "" port "" unused1 "" unused2 "" unused3 "" unused4 "" error "" )
-                return 1
+                # General failure in decoding the string
+                if [[ -z "$mat" ]]; then
+                    REPLY="-1"
+                    reply=( file "" rev "" repo "" wordrev "" proto "" user "" site "" site_inline "" flags "" port "" unused1 "" unused2 "" unused3 "" unused4 "" error "" )
+                    return 1
+                fi
+
+                # Skip decoded bits
+                strbits="${strbits[trylen+1,-1]}"
             fi
-
-            # Skip decoded bits
-            strbits="${strbits[trylen+1,-1]}"
 
             # Handle what has been matched, either selector or data
             case "$mat" in
@@ -339,12 +344,8 @@ bits_proto_site_port() {
         (( skip )) || bits+=( "${(@s::)codes[$site_lt]}" )
     fi
 
-    #
-    # Site preamble
-    #
+    # Site preamble - not added
 
-    (( ${#bits} > 0 )) && bits=( "${(@s::)codes[site_flags]}" "${bits[@]}" )
-    
     reply=( "${bits[@]}" )
     return 0
 }
