@@ -1,4 +1,5 @@
-# vim:ft=zsh
+# File: giturl.main
+# vim:ft=zsh:sw=4:et:sts=4
 # -*- mode: zsh -*-
 
 integer GU_HELP=0 GU_VERBOSE=0 GU_QUIET=0 GU_NOANSI=0 GU_DECODE=0

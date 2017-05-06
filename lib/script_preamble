@@ -1,4 +1,7 @@
 #!/usr/bin/env zsh
+# File: lib/script_preamble
+# vim:ft=zsh:sw=4:et:sts=4
+# -*- mode: zsh -*-
 
 local ZERO="${(%):-%N}"
 local BIN_DIR="${ZERO:h}"
@@ -41,4 +44,3 @@ PresentData() {
 }
 # }}}
 
-# vim:ft=zsh

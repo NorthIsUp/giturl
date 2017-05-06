@@ -1,3 +1,7 @@
+# File: lib/codes_huffman
+# vim:ft=zsh:sw=4:et:sts=4
+# -*- mode: zsh -*-
+
 # Map of huffman codes
 
 local -A codes
@@ -220,3 +224,4 @@ rproto_code=(
     101    ftps    
     110    rsync   
 )
+

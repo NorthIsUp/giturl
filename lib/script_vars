@@ -1,3 +1,7 @@
+# File: lib/script_vars
+# vim:ft=zsh:sw=4:et:sts=4
+# -*- mode: zsh -*-
+
 typeset -g LIB_DIR="${REPO_DIR/lib}"
 typeset -g ZKL_HOME="$HOME/.zekyll"
 typeset -g ZKL_REPOS_DIR="$ZKL_HOME/repos"
@@ -29,4 +33,3 @@ ZKLCOL=(
 
 section_letters=( A B C D E F G H I J K L M N O P Q R S T U V W X Y Z )
 
-# vim:ft=zsh

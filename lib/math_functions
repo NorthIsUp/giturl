@@ -1,3 +1,7 @@
+# File: lib/math_functions
+# vim:ft=zsh:sw=4:et:sts=4
+# -*- mode: zsh -*-
+
 setopt typesetsilent
 
 local -a input_characters
@@ -423,4 +427,3 @@ convert_integer_to_base_1024() {
 }
 # }}}
 
-# vim:ft=zsh
