@@ -14,7 +14,7 @@ giturl: giturl.main lib/script_preamble lib/script_vars lib/math_functions lib/c
 	cat giturl.main >> giturl
 	chmod a+x giturl
 
-install:
+install: giturl
 	$(INSTALL) -d $(SHARE_DIR)
 	$(INSTALL) -d $(DOC_DIR)
 	cp giturl $(BIN_DIR)
