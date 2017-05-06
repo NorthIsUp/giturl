@@ -15,6 +15,11 @@ process_meta_data() {
     local strbits="${(j::)bits}"
     integer init_len="${#strbits}"
 
+    # Pop version bits
+    integer ver2="${strbits[1]}"
+    integer ver1="${strbits[2]}"
+    strbits="${strbits[3,-1]}"
+
     local -A decoded
     decoded=(
         file ""
@@ -175,12 +180,6 @@ get_code_data() {
 
     # Skip bits that were processed as meta data
     bits=( "${(@)bits[1,-1*REPLY-1]}" )
-
-    # Two last bits here are version
-    local -a version
-    version=( "${(@)bits[-2,-1]}" )
-    bits[-1]=()
-    bits[-1]=()
 
     REPLY="${bits[*]}"
     reply=( "${meta_reply[@]}" )
@@ -410,10 +409,7 @@ bits_remove_if_start_stop() {
 build_code() {
     local proto="$1" user="$2" site="$3" port="$4" repo="$5" rev="$6" file_path="$7"
 
-    local -a bits
-    bits=( 0 0 )    # version
-
-    local -a appendix
+    local -a bits appendix
 
     bits_start
     appendix+=( "${reply[@]}" )
@@ -458,7 +454,8 @@ build_code() {
         fi
     else
         appendix=( "${(Oa)appendix[@]}" )
-        bits=( "${bits[@]}" "${appendix[@]}" )
+        # Also include version bits 0 0
+        bits=( "${bits[@]}" "${appendix[@]}" 0 0 )
         # print "${(j::)bits}"
     fi
 
