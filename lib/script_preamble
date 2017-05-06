@@ -1,3 +1,13 @@
+#!/usr/bin/env zsh
+
+local ZERO="${(%):-%N}"
+local BIN_DIR="${ZERO:h}"
+
+# On asciinema 0 and ZERO are functionargzero
+[[ "$BIN_DIR" = "." ]] && BIN_DIR="/usr/local/bin"
+
+local SHARE_DIR="${BIN_DIR:h}/share"
+
 emulate -LR zsh
 
 zmodload zsh/zutil

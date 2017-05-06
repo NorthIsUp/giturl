@@ -1,17 +1,5 @@
-#!/usr/bin/env zsh
-
-local ZERO="${(%):-%N}"
-local BIN_DIR="${ZERO:h}"
-
-# On asciinema 0 and ZERO are functionargzero
-[[ "$BIN_DIR" = "." ]] && BIN_DIR="/usr/local/bin"
-
-local SHARE_DIR="${BIN_DIR:h}/share"
-source "$SHARE_DIR/giturl/script_preamble"
-source "$SHARE_DIR/giturl/script_vars"
-source "$SHARE_DIR/giturl/math_functions"
-source "$SHARE_DIR/giturl/codes_huffman"
-source "$SHARE_DIR/giturl/coding_functions"
+# vim:ft=zsh
+# -*- mode: zsh -*-
 
 integer GU_HELP=0 GU_VERBOSE=0 GU_QUIET=0 GU_NOANSI=0 GU_DECODE=0
 local GU_PATH GU_REVISION
