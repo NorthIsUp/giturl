@@ -19,12 +19,6 @@ setopt extendedglob typesetsilent warncreateglobal
 
 bindkey -e
 
-local REPLY
-local -a reply
-
-builtin autoload -Uz colors
-colors
-
 # FUNCTION: SetMessage {{{
 SetMessage() {
     echo "$1"
