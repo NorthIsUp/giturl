@@ -152,14 +152,15 @@ process_meta_data() {
 # REPLY has the revision bits
 get_code_data() {
     local gcode="$1"
-    decode_gcode "$gcode"
+    decode_gcode "$gcode" || return $?
 
     local -a bits
     bits=( "${reply[@]}" )
 
-    process_meta_data "${bits[@]}"
-    # $reply contains: ( file "" rev "" repo "" wordrev "" proto "" user "" site "" site_inline "" flags "" port "" unused1 "" unused2 "" unused3 ""  unused4 "" error "" )
-    # $REPLY contains: number of final bits that contained the meta data
+    process_meta_data "${bits[@]}" || return $?
+
+    # $reply = ( file "" rev "" repo "" wordrev "" proto "" user "" site "" site_inline "" flags "" port "" unused1 "" unused2 "" unused3 ""  unused4 "" error "" )
+    # $REPLY contains: number of bits that contained the meta data
     local -a meta_reply
     meta_reply=( "${reply[@]}" )
 
@@ -167,11 +168,10 @@ get_code_data() {
     bits=( "${(@)bits[1,-1*REPLY-1]}" )
 
     # Two last bits here are version
+    local -a version
     version=( "${(@)bits[-2,-1]}" )
     bits[-1]=()
     bits[-1]=()
-
-    integer size="${#bits}"
 
     REPLY="${bits[*]}"
     reply=( "${meta_reply[@]}" )

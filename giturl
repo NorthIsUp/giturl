@@ -115,30 +115,22 @@ else
     if [[ "$code" != [0-9a-zA-ZµºÀ-ÖØ-áãäæ-öøú-ƔƖ-ơƤ-ǃǍ-Ǳǳ-ǵǷ-Ɉɋ-ɏḀ-ẝẟ-ỹỻͻ-ͽΆΈΑ-ΡΣ-ΩΫ-ψϋ-ώϐ-ϒϔ-Ϡϥϧ-ϩϫ-ϲϵϷ-Ϲϻ-ϿЀ-џѡ-ѣѥѫѱ-ѳѵѷѻѽѿ-ҁҋ-ҟҡ-ҥҩ-ҳҵ-һӀ-ӌӎӐ-ӿא-דטך-מס-פ]## ]]; then
         print "${fg[red]}Error in code. First argument should be gitu://... or just gcode (with proper characters: 0-9 a-z A-Z [µºÀ-ÖØ-áãäæ-öøú-ƔƖ-ơƤ-ǃǍ-Ǳǳ-ǵǷ-Ɉɋ-ɏḀ-ẝẟ-ỹỻͻ-ͽΆΈΑ-ΡΣ-ΩΫ-ψϋ-ώϐ-ϒϔ-Ϡϥϧ-ϩϫ-ϲϵϷ-Ϲϻ-ϿЀ-џѡ-ѣѥѫѱ-ѳѵѷѻѽѿ-ҁҋ-ҟҡ-ҥҩ-ҳҵ-һӀ-ӌӎӐ-ӿא-דטך-מס-פ])${reset_color}"
         exit 10
-    elif decode_gcode "$code"; then
-        local -a bits
-        bits=( "${reply[@]}" )
+    elif get_code_data "$code"; then
+        # $reply = ( file "" rev "" repo "" wordrev "" proto "" site "" site_inline "" flags "" port "" unused1 "" unused2 "" unused3 ""  unused4 "" error "" )
+        local -A mdata
+        mdata=( "${reply[@]}" )
 
-        if process_meta_data "${bits[@]}"; then
-            # $reply = ( file "" rev "" repo "" wordrev "" proto "" site "" site_inline "" flags "" port "" unused1 "" unused2 "" unused3 ""  unused4 "" error "" )
-            local -A mdata
-            mdata=( "${reply[@]}" )
-
-            local site="${mdata[site]}"
-            if [[ -z "$site" ]]; then
-                site="${mdata[site_inline]}"
-                [[ -z "$site" ]] && site="github.com"
-            else
-                site="${rserver_site[$site]}"
-            fi
-
-            PresentData "${mdata[proto]}" "${mdata[user]}" "$site" "${mdata[port]}" "${mdata[repo]}" "${mdata[rev]}" "${mdata[file]}"
+        local site="${mdata[site]}"
+        if [[ -z "$site" ]]; then
+            site="${mdata[site_inline]}"
+            [[ -z "$site" ]] && site="github.com"
         else
-            print "${fg[red]}Could not decode, error in given code${reset_color}"
-            exit 8
+            site="${rserver_site[$site]}"
         fi
+
+        PresentData "${mdata[proto]}" "${mdata[user]}" "$site" "${mdata[port]}" "${mdata[repo]}" "${mdata[rev]}" "${mdata[file]}"
     else
-        print "${fg[red]}Error in code. First argument should be gitu://... or just the code (alpha-numeric characters only)${reset_color}"
+        print "${fg[red]}Cannot decode. Apparently, the gcode has correct characters, but the data contained is corrupted${reset_color}"
         exit 9
     fi
 fi
