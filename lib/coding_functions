@@ -39,123 +39,102 @@ process_meta_data() {
         error ""
     )
 
-    # Is there SS?
-    if [[ "${strbits[1,${#codes[ss]}]}" = "${codes[ss]}" ]]; then
-        strbits="${strbits[${#codes[ss]}+1,-1]}"
-        # Is there immediate following SS?
-        if [[ "${strbits[1,${#codes[ss]}]}" = "${codes[ss]}" ]]; then
-            # We should skip one SS and there is nothing to decode
-            REPLY="${#codes[ss]}"
-            reply=( file "" rev "" repo "" wordrev "" proto "" user "" site "" site_inline "" flags "" port "" unused1 ""  unused2 "" unused3 ""  unused4 "" error "" )
-            return 0
-        fi
+    local current_selector="error"
+    integer trylen first=1
+    local mat trystr
+    while (( 1 )); do
+        if (( first )); then
+            mat="site_flags"
+            first=0
+        else
+            mat=""
+            for (( trylen=6; trylen <= 7; trylen ++ )); do
+                # Take substring of len $trylen and check if
+                # it matches any Huffman code
+                trystr="${strbits[1,trylen]}"
+                mat="${rcodes[$trystr]}"
+                [ -n "$mat" ] && break
+            done
 
-        #
-        # Follows meta data, decode it
-        #
-
-        # keys of the 'decoded' hash
-        local current_selector="error"
-        integer trylen first=1
-        local mat trystr
-        while (( 1 )); do
-            if (( first )); then
-                mat="site_flags"
-                first=0
-            else
-                mat=""
-                for (( trylen=6; trylen <= 7; trylen ++ )); do
-                    # Take substring of len $trylen and check if
-                    # it matches any Huffman code
-                    trystr="${strbits[1,trylen]}"
-                    mat="${rcodes[$trystr]}"
-                    [ -n "$mat" ] && break
-                done
-
-                # General failure in decoding the string
-                if [[ -z "$mat" ]]; then
-                    REPLY="-1"
-                    reply=( file "" rev "" repo "" wordrev "" proto "" user "" site "" site_inline "" flags "" port "" unused1 "" unused2 "" unused3 "" unused4 "" error "" )
-                    return 1
-                fi
-
-                # Skip decoded bits
-                strbits="${strbits[trylen+1,-1]}"
+            # General failure in decoding the string
+            if [[ -z "$mat" ]]; then
+                REPLY="-1"
+                reply=( file "" rev "" repo "" wordrev "" proto "" user "" site "" site_inline "" flags "" port "" unused1 "" unused2 "" unused3 "" unused4 "" error "" )
+                return 1
             fi
 
-            # Handle what has been matched, either selector or data
-            case "$mat" in
-                (ss)
-                    break
-                    ;;
-                (repo_rev_usr)
+            # Skip decoded bits
+            strbits="${strbits[trylen+1,-1]}"
+        fi
+
+        # Handle what has been matched, either selector or data
+        case "$mat" in
+            (ss)
+                break
+                ;;
+            (repo_rev_usr)
+                inline=0
+                if [[ "$current_selector" = "repo" ]]; then
+                    current_selector="rev"
+                elif [[ "$current_selector" = "rev" ]]; then
+                    current_selector="user"
+                else
+                    current_selector="repo"
+                fi
+                ;;
+            (file|wordrev)
+                inline=0
+                current_selector="$mat"
+                ;;
+            (site_flags)
+                [[ "$current_selector" = "site_flags" ]] && {
+                    inline=1
+                } || {
                     inline=0
-                    if [[ "$current_selector" = "repo" ]]; then
-                        current_selector="rev"
-                    elif [[ "$current_selector" = "rev" ]]; then
-                        current_selector="user"
+                    current_selector="$mat"
+
+                    # Short path for port number - conditional constant 16 bits
+                    if [[ "${strbits[1]}" = "1" ]]; then
+                        local port_bits="${strbits[2,17]}"
+                        decoded[port]=$(( [#10] 2#$port_bits ))
+                        strbits="${strbits[18,-1]}"
                     else
-                        current_selector="repo"
+                        strbits="${strbits[2,-1]}"
                     fi
-                    ;;
-                (file|wordrev)
-                    inline=0
-                    current_selector="$mat"
-                    ;;
-                (site_flags)
-                    [[ "$current_selector" = "site_flags" ]] && {
-                        inline=1
-                    } || {
-                        inline=0
-                        current_selector="$mat"
 
-                        # Short path for port number - conditional constant 16 bits
-                        if [[ "${strbits[1]}" = "1" ]]; then
-                            local port_bits="${strbits[2,17]}"
-                            decoded[port]=$(( [#10] 2#$port_bits ))
-                            strbits="${strbits[18,-1]}"
+                    # Short path for protocol - always 3 bits
+                    local proto_bits="${strbits[1,3]}"
+                    decoded[proto]="${rproto_code[$proto_bits]}"
+                    strbits="${strbits[4,-1]}"
+                }
+                ;;
+            (unused1|unused2|unused3|unused4)
+                inline=0
+                current_selector="$mat"
+                ;;
+            (*)
+                [[ "$current_selector" = "site_flags" ]] && {
+                    if (( inline )); then
+                        decoded[site_inline]+="$mat"
+                    else
+                        if [[ ${input_characters[(i)$mat]} -gt ${input_characters[(i)3]} ]]; then
+                            mat="${rsites_flags[$mat]}"
+                            [[ -n "${decoded[flags]}" ]] && decoded[flags]+=","
+                            decoded[flags]+="$mat"
                         else
-                            strbits="${strbits[2,-1]}"
+                            mat="${rsites_flags[$mat]}"
+                            decoded[site]="$mat"
                         fi
+                    fi
+                } || {
+                    decoded[$current_selector]+="$mat"
+                }
+                ;;
+        esac
+    done
 
-                        # Short path for protocol - always 3 bits
-                        local proto_bits="${strbits[1,3]}"
-                        decoded[proto]="${rproto_code[$proto_bits]}"
-                        strbits="${strbits[4,-1]}"
-                    }
-                    ;;
-                (unused1|unused2|unused3|unused4)
-                    inline=0
-                    current_selector="$mat"
-                    ;;
-                (*)
-                    [[ "$current_selector" = "site_flags" ]] && {
-                        if (( inline )); then
-                            decoded[site_inline]+="$mat"
-                        else
-                            if [[ ${input_characters[(i)$mat]} -gt ${input_characters[(i)3]} ]]; then
-                                mat="${rsites_flags[$mat]}"
-                                [[ -n "${decoded[flags]}" ]] && decoded[flags]+=","
-                                decoded[flags]+="$mat"
-                            else
-                                mat="${rsites_flags[$mat]}"
-                                decoded[site]="$mat"
-                            fi
-                        fi
-                    } || {
-                        decoded[$current_selector]+="$mat"
-                    }
-                    ;;
-            esac
-        done
-
-        REPLY="$(( init_len - ${#strbits} ))"
-        reply=( "${(kv)decoded[@]}" )
-    else
-        # No meta data and no special ending of zekyll bits
-        REPLY="0"
-        reply=( file "" rev "" repo "" wordrev "" proto "" user "" site "" site_inline "" flags "" port "" unused1 "" unused2 "" unused3 "" unused4 "" error "" )
-    fi
+    REPLY="$(( init_len - ${#strbits} ))"
+    reply=( "${(kv)decoded[@]}" )
 
     return 0
 }
@@ -411,9 +390,6 @@ build_code() {
 
     local -a bits appendix
 
-    bits_start
-    appendix+=( "${reply[@]}" )
-
     bits_proto_site_port "$proto" "$site" "$port"
     appendix+=( "${reply[@]}" )
 
@@ -442,22 +418,10 @@ build_code() {
     bits_remove_if_start_stop "${appendix[@]}"
     appendix=( "${reply[@]}" )
 
-    if [[ "${#appendix}" = 0 ]]; then
-        # Cannot happen (in-data SS bits at the end) with version bits 0,0
-        local -a rev_bits
-        rev_bits=( "${(@s::)codes['ss']}" )
-        rev_bits=( "${(Oa)rev_bits[@]}" )
-        if bits_compare_suffix "${(j::)bits}" "${(j::)rev_bits}"; then
-            # No metadata but 'ss' at end – add another
-            # one to mark that the 'ss' is a real data
-            bits=( "${bits[@]}" "${rev_bits[@]}" )
-        fi
-    else
-        appendix=( "${(Oa)appendix[@]}" )
-        # Also include version bits 0 0
-        bits=( "${bits[@]}" "${appendix[@]}" 0 0 )
-        # print "${(j::)bits}"
-    fi
+    appendix=( "${(Oa)appendix[@]}" )
+    # Also include version bits 0 0
+    bits=( "${bits[@]}" "${appendix[@]}" 0 0 )
+    # print "${(j::)bits}"
 
     encode_gcode_arr01 "${bits[@]}"
 }
