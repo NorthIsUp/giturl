@@ -38,3 +38,22 @@ PresentData() {
 }
 # }}}
 
+# FUNCTION: PresentURL {{{
+PresentURL() {
+    local proto="$1" user="$2" site="$3" port="$4" upath="$5" rev="$6" file="$7" extended="${8:-0}"
+
+    local out="$proto"
+    out+="://$site"
+    [[ -n "$port" ]] && out+=":$port"
+    out+="/$upath"
+
+    if (( extended )); then
+        print -n "$fg[magenta]$out"
+        [[ -n "$rev" ]] && print -n " / rev:$rev"
+        [[ -n "$file" ]] && print -n " / file:$rev"
+        print
+    else
+        print "$fg[magenta]$out"
+    fi
+}
+# }}}

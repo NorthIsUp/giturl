@@ -116,7 +116,13 @@ else
             site="${rserver_site[$site]}"
         fi
 
-        PresentData "${mdata[proto]}" "${mdata[user]}" "$site" "${mdata[port]}" "${mdata[repo]}" "${mdata[rev]}" "${mdata[file]}"
+        if (( GU_QUIET )); then
+            PresentURL "${mdata[proto]}" "${mdata[user]}" "$site" "${mdata[port]}" "${mdata[repo]}" "${mdata[rev]}" "${mdata[file]}" 1
+        else
+            PresentData "${mdata[proto]}" "${mdata[user]}" "$site" "${mdata[port]}" "${mdata[repo]}" "${mdata[rev]}" "${mdata[file]}"
+            print
+            PresentURL "${mdata[proto]}" "${mdata[user]}" "$site" "${mdata[port]}" "${mdata[repo]}" "${mdata[rev]}" "${mdata[file]}"
+        fi
     else
         print "${fg[red]}Cannot decode. Apparently, the gcode has correct characters, but the data contained is corrupted${reset_color}"
         exit 9
