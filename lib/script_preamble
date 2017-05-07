@@ -13,6 +13,8 @@ local SHARE_DIR="${BIN_DIR:h}/share"
 
 emulate -LR zsh
 
+[[ -z "$LANG" ]] && LANG="en_US.UTF-8"
+
 zmodload zsh/zutil
 
 setopt extendedglob typesetsilent warncreateglobal
