@@ -19,6 +19,25 @@ setopt extendedglob typesetsilent warncreateglobal
 
 bindkey -e
 
+# FUNCTION: Help {{{
+Help() {
+    print -r "USAGE: giturl <URL> [options]
+       giturl -d <GitURL|gcode|//gcode>
+
+Options:
+ -h, --help              Print help and exit
+ -q, --quiet             Less verbose output
+ -n, --noansi            Don't use colors in output
+ -r <r>, --revision <r>  Which revision to encode in GitURL
+ -p <p>, --path <p>      A path to encode in GitURL
+ -d <c>, --decode <c>    GitURL or gcode to decode
+
+Examples:
+  giturl https://github.com/zdharma/giturl -p lib/codes_huffman
+  giturl -d 3ếЭãѿŒΓȏĤÒṄÅṥҫȜẙПȟϛṄӗŀєþ
+  giturl -d gitu://VЯĦṟěň4ӊǮ4ХƵȽȤẢ4ФḸțḊƵȽȟϛṄӗŀєþ"
+}
+# }}}
 # FUNCTION: SetMessage {{{
 SetMessage() {
     echo "$1"

@@ -19,6 +19,11 @@ zparseopts -E -D -A opthash h -help v -verbose q -quiet n -noansi p: -path: r: -
 
 (( GU_NOANSI )) && { colors=(); fg=(); bg=(); reset_color=""; }
 
+if (( GU_HELP )); then
+    Help
+    exit 0
+fi
+
 if (( GU_DECODE == 0 )); then
     local protocol user site port upath
 
