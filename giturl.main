@@ -89,12 +89,11 @@ if (( GU_DECODE == 0 )); then
         exit 7
     fi
 
-    print
-    PresentData "$protocol" "$user" "$site" "$port" "$upath" "$GU_REVISION" "$GU_PATH"
+    (( GU_QUIET )) || { print; PresentData "$protocol" "$user" "$site" "$port" "$upath" "$GU_REVISION" "$GU_PATH"; }
 
     build_code "$protocol" "$user" "$site" "$port" "$upath" "$GU_REVISION" "$GU_PATH"
 
-    print
+    (( GU_QUIET )) || print
     print $fg[magenta]"gitu://$REPLY"$reset_color
 else
     local code="$1"
