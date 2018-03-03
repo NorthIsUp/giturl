@@ -6,22 +6,22 @@ BIN_DIR?=$(DESTDIR)$(PREFIX)/bin
 SHARE_DIR?=$(DESTDIR)$(PREFIX)/share/$(NAME)
 DOC_DIR?=$(DESTDIR)$(PREFIX)/share/doc/$(NAME)
 
-all: giturl
+all: zgiturl
 
-giturl: giturl.main lib/script_preamble lib/script_vars lib/math_functions lib/codes_huffman lib/coding_functions
-	cat lib/script_preamble > giturl
-	cat lib/script_vars lib/math_functions lib/codes_huffman lib/coding_functions >> giturl
-	cat giturl.main >> giturl
-	chmod a+x giturl
+zgiturl: giturl.main lib/script_preamble lib/script_vars lib/math_functions lib/codes_huffman lib/coding_functions
+	cat lib/script_preamble > zgiturl
+	cat lib/script_vars lib/math_functions lib/codes_huffman lib/coding_functions >> zgiturl
+	cat giturl.main >> zgiturl
+	chmod a+x zgiturl
 
-install: giturl
+install: zgiturl
 	$(INSTALL) -d $(SHARE_DIR)
 	$(INSTALL) -d $(DOC_DIR)
-	cp giturl $(BIN_DIR)
+	cp zgiturl $(BIN_DIR)
 	cp README.md NEWS LICENSE $(DOC_DIR)
 
 uninstall:
-	rm -f $(BIN_DIR)/giturl
+	rm -f $(BIN_DIR)/zgiturl
 	rm -f $(DOC_DIR)/README.md $(DOC_DIR)/NEWS $(DOC_DIR)/LICENSE
 	[ -d $(DOC_DIR) ] && rmdir $(DOC_DIR) || true
 	rm -f $(SHARE_DIR)/*
