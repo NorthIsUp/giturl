@@ -177,7 +177,7 @@ bits_stop() {
 # FUNCTION: bits_rev {{{
 bits_rev() {
     local -a bits
-    local rev="$1"
+    local rev="$1" lt
 
     for lt in "${(@s::)rev}"; do
         if [[ -n "${codes[$lt]}" ]];then
@@ -199,7 +199,7 @@ bits_rev() {
 # FUNCTION: bits_user {{{
 bits_user() {
     local -a bits
-    local user="$1"
+    local user="$1" lt
 
     for lt in "${(@s::)user}"; do
         if [[ -n "${codes[$lt]}" ]];then
@@ -221,7 +221,7 @@ bits_user() {
 # FUNCTION: bits_path {{{
 bits_path() {
     local -a bits
-    local file="$1"
+    local file="$1" lt
 
     for lt in "${(@s::)file}"; do
         if [[ -n "${codes[$lt]}" ]];then
