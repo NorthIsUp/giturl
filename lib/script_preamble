@@ -70,8 +70,8 @@ PresentURL() {
 
     if (( extended )); then
         print -n "$fg[magenta]$out"
-        [[ -n "$rev" ]] && print -n " / rev:$rev"
-        [[ -n "$file" ]] && print -n " / file:$file"
+        [[ -n "$rev" ]] && print -n " /  rev:$rev"
+        [[ -n "$file" ]] && print -n " /  file:$file"
         print
     else
         print "$fg[magenta]$out"
