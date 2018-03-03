@@ -10,8 +10,7 @@ all: zgiturl
 
 zgiturl: giturl.main lib/script_preamble lib/script_vars lib/math_functions lib/codes_huffman lib/coding_functions
 	cat lib/script_preamble > zgiturl
-	cat lib/script_vars lib/math_functions lib/codes_huffman lib/coding_functions >> zgiturl
-	cat giturl.main >> zgiturl
+	cat lib/script_vars lib/math_functions lib/codes_huffman lib/coding_functions giturl.main >> zgiturl
 	chmod a+x zgiturl
 
 install: zgiturl
