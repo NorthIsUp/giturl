@@ -26,4 +26,7 @@ uninstall:
 	rm -f $(SHARE_DIR)/*
 	[ -d $(SHARE_DIR) ] && rmdir $(SHARE_DIR) || true
 
+clean:
+	rm -f zgiturl
+
 .PHONY: all install uninstall
